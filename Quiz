@@ -1,0 +1,98 @@
+
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Post</title>
+    <style>
+        body {{ font-family: Arial, sans-serif; padding: 2em; background-color: #f9f9f9; }}
+        .hidden {{ display: none; }}
+        .question-box {{ margin-top: 2em; padding: 1em; background: white; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }}
+        label, select, button {{ display: block; margin: 1em 0; }}
+    </style>
+</head>
+<body>
+    <h1>Quizløype</h1>
+    <p>Velg post og lag:</p>
+
+    <label for="post">Post:</label>
+    <select id="post">
+        <option value="post1">Post 1</option>
+        <option value="post2">Post 2</option>
+        <option value="post3">Post 3</option>
+        <option value="post4">Post 4</option>
+    </select>
+
+    <label for="lag">Lag:</label>
+    <select id="lag">
+        <option value="Lag 1">Lag 1</option>
+        <option value="Lag 2">Lag 2</option>
+        <option value="Lag 3">Lag 3</option>
+        <option value="Lag 4">Lag 4</option>
+        <option value="Lag 5">Lag 5</option>
+        <option value="Lag 6">Lag 6</option>
+    </select>
+
+    <button onclick="checkLocation()">Sjekk posisjon</button>
+
+    <div id="status"></div>
+
+    <div id="question" class="question-box hidden">
+        <h2>Spørsmål</h2>
+        <p>Hvilket år ble firmaet stiftet?</p>
+        <input type="text" placeholder="Svar her...">
+    </div>
+
+    <script>
+        const postCoords = {{
+            "post1": {{ lat: 59.9139, lng: 10.7522 }},  // Oslo sentrum
+            "post2": {{ lat: 60.3913, lng: 5.3221 }},   // Bergen
+            "post3": {{ lat: 63.4305, lng: 10.3951 }},  // Trondheim
+            "post4": {{ lat: 58.9690, lng: 5.7331 }}    // Stavanger
+        }};
+
+        const radiusMeters = 50; // hvor nære man må være posten
+
+        function getDistance(lat1, lon1, lat2, lon2) {{
+            const R = 6371e3; // meters
+            const φ1 = lat1 * Math.PI/180;
+            const φ2 = lat2 * Math.PI/180;
+            const Δφ = (lat2-lat1) * Math.PI/180;
+            const Δλ = (lon2-lon1) * Math.PI/180;
+
+            const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
+                      Math.cos(φ1) * Math.cos(φ2) *
+                      Math.sin(Δλ/2) * Math.sin(Δλ/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+
+            return R * c;
+        }}
+
+        function checkLocation() {{
+            const selectedPost = document.getElementById("post").value;
+            const status = document.getElementById("status");
+            const questionBox = document.getElementById("question");
+            status.innerText = "Henter posisjon...";
+
+            navigator.geolocation.getCurrentPosition(position => {{
+                const userLat = position.coords.latitude;
+                const userLng = position.coords.longitude;
+
+                const target = postCoords[selectedPost];
+                const dist = getDistance(userLat, userLng, target.lat, target.lng);
+
+                if (dist <= radiusMeters) {{
+                    status.innerText = "Du er på riktig sted!";
+                    questionBox.classList.remove("hidden");
+                }} else {{
+                    status.innerText = `Du er ${Math.round(dist)} meter unna. Gå nærmere posten.`;
+                    questionBox.classList.add("hidden");
+                }}
+            }}, () => {{
+                status.innerText = "Klarte ikke hente posisjon. Sørg for at du har gitt tilgang.";
+            }});
+        }}
+    </script>
+</body>
+</html>

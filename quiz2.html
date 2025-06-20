@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Quizløype - Post 1</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body { font-family: Arial; padding: 1em; max-width: 500px; margin: auto; }
+    label, select, button { display: block; margin-top: 1em; }
+    #question { margin-top: 2em; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <h2>Quizløype - Post 1</h2>
+  <label for="team">Velg lag:</label>
+  <select id="team">
+    <option value="">-- Velg lag --</option>
+    <option value="Lag 1">Lag 1</option>
+    <option value="Lag 2">Lag 2</option>
+    <option value="Lag 3">Lag 3</option>
+    <option value="Lag 4">Lag 4</option>
+    <option value="Lag 5">Lag 5</option>
+    <option value="Lag 6">Lag 6</option>
+  </select>
+
+  <label for="post">Velg post:</label>
+  <select id="post">
+    <option value="">-- Velg post --</option>
+    <option value="Post 1">Post 1</option>
+    <option value="Post 2">Post 2</option>
+    <option value="Post 3">Post 3</option>
+    <option value="Post 4">Post 4</option>
+  </select>
+
+  <button onclick="checkPosition()">Sjekk posisjon</button>
+
+  <div id="message"></div>
+  <div id="question"></div>
+
+  <script>
+    const postCoordinates = {
+      "Post 1": { lat: 59.9127, lon: 10.7461 }, // Oslo sentrum
+      "Post 2": { lat: 59.91, lon: 10.75 },
+      "Post 3": { lat: 59.913, lon: 10.74 },
+      "Post 4": { lat: 59.914, lon: 10.745 }
+    };
+
+    const quizQuestions = {
+      "Post 1": "Hvilket år ble firmaet stiftet?"
+    };
+
+    const maxDistanceMeters = 50;
+
+    function checkPosition() {
+      const team = document.getElementById("team").value;
+      const post = document.getElementById("post").value;
+      const msg = document.getElementById("message");
+      const questionBox = document.getElementById("question");
+
+      msg.innerText = "";
+      questionBox.innerText = "";
+
+      if (!team || !post) {
+        msg.innerText = "Velg både lag og post.";
+        return;
+      }
+
+      if (!navigator.geolocation) {
+        msg.innerText = "Geolokasjon støttes ikke av nettleseren.";
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(
+        function(position) {
+          const userLat = position.coords.latitude;
+          const userLon = position.coords.longitude;
+          const postLat = postCoordinates[post].lat;
+          const postLon = postCoordinates[post].lon;
+
+          const dist = distanceInMeters(userLat, userLon, postLat, postLon);
+
+          if (dist <= maxDistanceMeters) {
+            questionBox.innerText = quizQuestions[post] || "Ingen spørsmål definert for denne posten.";
+          } else {
+            msg.innerText = `Du er ${Math.round(dist)} meter unna riktig posisjon. Gå nærmere posten.`;
+          }
+        },
+        function(error) {
+          msg.innerText = "Klarte ikke hente posisjon: " + error.message;
+        }
+      );
+    }
+
+    function distanceInMeters(lat1, lon1, lat2, lon2) {
+      const R = 6371000; // meter
+      const φ1 = lat1 * Math.PI / 180;
+      const φ2 = lat2 * Math.PI / 180;
+      const Δφ = (lat2 - lat1) * Math.PI / 180;
+      const Δλ = (lon2 - lon1) * Math.PI / 180;
+
+      const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+                Math.cos(φ1) * Math.cos(φ2) *
+                Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+      return R * c;
+    }
+  </script>
+</body>
+</html>

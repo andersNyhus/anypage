@@ -42,74 +42,94 @@
   <div id="message"></div>
   <div id="question"></div>
 
-  <script>
-    const postCoordinates = {
-      "Post 1": { lat: 59.9111, lon: 10.6392 }, // Kontoret
-      "Post 2": { lat: 59.91, lon: 10.75 },
-      "Post 3": { lat: 59.913, lon: 10.74 },
-      "Post 4": { lat: 59.914, lon: 10.745 }
-    };
+<script>
+  // Struktur: postCoordinates[lag][post] = {lat, lon}
+  const postCoordinates = {
+    "Lag 1": {
+      "Post 1": { lat: 59.911, lon: 10.75 },
+      "Post 2": { lat: 59.912, lon: 10.751 },
+      "Post 3": { lat: 59.913, lon: 10.752 },
+      "Post 4": { lat: 59.914, lon: 10.753 }
+    },
+    "Lag 2": {
+      "Post 1": { lat: 59.921, lon: 10.75 },
+      "Post 2": { lat: 59.922, lon: 10.751 },
+      "Post 3": { lat: 59.923, lon: 10.752 },
+      "Post 4": { lat: 59.924, lon: 10.753 }
+    },
+    // Legg til Lag 3–12 her på samme måte
+  };
 
-    const quizQuestions = {
-      "Post 1": "Hvilket år ble firmaet stiftet?"
-    };
+  const quizQuestions = {
+    "Post 1": "Hvilket år ble firmaet stiftet?",
+    "Post 2": "Hva er hovedproduktet vårt?",
+    "Post 3": "Hva står forkortelsen i firmanavnet for?",
+    "Post 4": "Hvor mange ansatte hadde vi i 2020?"
+  };
 
-    const maxDistanceMeters = 50;
+  const maxDistanceMeters = 50;
 
-    function checkPosition() {
-      const team = document.getElementById("team").value;
-      const post = document.getElementById("post").value;
-      const msg = document.getElementById("message");
-      const questionBox = document.getElementById("question");
+  function checkPosition() {
+    const team = document.getElementById("team").value;
+    const post = document.getElementById("post").value;
+    const msg = document.getElementById("message");
+    const questionBox = document.getElementById("question");
 
-      msg.innerText = "";
-      questionBox.innerText = "";
+    msg.innerText = "";
+    questionBox.innerText = "";
 
-      if (!team || !post) {
-        msg.innerText = "Velg både lag og post.";
-        return;
-      }
+    if (!team || !post) {
+      msg.innerText = "Velg både lag og post.";
+      return;
+    }
 
-      if (!navigator.geolocation) {
-        msg.innerText = "Geolokasjon støttes ikke av nettleseren.";
-        return;
-      }
+    if (!postCoordinates[team] || !postCoordinates[team][post]) {
+      msg.innerText = "Ingen lokasjon definert for dette laget og denne posten.";
+      return;
+    }
 
-      navigator.geolocation.getCurrentPosition(
-        function(position) {
-          const userLat = position.coords.latitude;
-          const userLon = position.coords.longitude;
-          const postLat = postCoordinates[post].lat;
-          const postLon = postCoordinates[post].lon;
+    if (!navigator.geolocation) {
+      msg.innerText = "Geolokasjon støttes ikke av nettleseren.";
+      return;
+    }
 
-          const dist = distanceInMeters(userLat, userLon, postLat, postLon);
+    navigator.geolocation.getCurrentPosition(
+      function(position) {
+        const userLat = position.coords.latitude;
+        const userLon = position.coords.longitude;
+        const target = postCoordinates[team][post];
 
-          if (dist <= maxDistanceMeters) {
-            questionBox.innerText = quizQuestions[post] || "Ingen spørsmål definert for denne posten.";
-          } else {
-            msg.innerText = `Du er ${Math.round(dist)} meter unna riktig posisjon. Gå nærmere posten.`;
-          }
-        },
-        function(error) {
-          msg.innerText = "Klarte ikke hente posisjon: " + error.message;
+        const dist = distanceInMeters(userLat, userLon, target.lat, target.lon);
+
+        if (dist <= maxDistanceMeters) {
+          questionBox.innerText = quizQuestions[post] || "Ingen spørsmål definert.";
+        } else {
+          msg.innerText = `Du er ${Math.round(dist)} meter unna riktig posisjon. Gå nærmere posten.`;
         }
-      );
-    }
+      },
+      function(error) {
+        msg.innerText = "Klarte ikke hente posisjon: " + error.message;
+      }
+    );
+  }
 
-    function distanceInMeters(lat1, lon1, lat2, lon2) {
-      const R = 6371000; // meter
-      const φ1 = lat1 * Math.PI / 180;
-      const φ2 = lat2 * Math.PI / 180;
-      const Δφ = (lat2 - lat1) * Math.PI / 180;
-      const Δλ = (lon2 - lon1) * Math.PI / 180;
+  function distanceInMeters(lat1, lon1, lat2, lon2) {
+    const R = 6371000;
+    const φ1 = lat1 * Math.PI / 180;
+    const φ2 = lat2 * Math.PI / 180;
+    const Δφ = (lat2 - lat1) * Math.PI / 180;
+    const Δλ = (lon2 - lon1) * Math.PI / 180;
 
-      const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
-                Math.cos(φ1) * Math.cos(φ2) *
-                Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
-      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    const a = Math.sin(Δφ / 2) ** 2 +
+              Math.cos(φ1) * Math.cos(φ2) *
+              Math.sin(Δλ / 2) ** 2;
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
-      return R * c;
-    }
-  </script>
+    return R * c;
+  }
+</script>
+
+  
+  
 </body>
 </html>

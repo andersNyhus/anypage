@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Quizløype - Lokasjon</title>
+  <title>Quizløype</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     body { font-family: Arial; padding: 1em; max-width: 500px; margin: auto; }
@@ -10,7 +10,7 @@
   </style>
 </head>
 <body>
-  <h2>Quizløype - Lokasjon</h2>
+  <h2>Quizløype - På rett sted?</h2>
   <label for="team">Velg lag:</label>
   <select id="team">
     <option value="">-- Velg lag --</option>
@@ -42,10 +42,12 @@
 
   <div id="message"></div>
   <div id="question"></div>
-  
+  <div id="question" style="margin-top: 2em;"></div>
+  <div id="nextCoords" style="margin-top: 1em; font-style: italic;"></div>
+
 
 <script>
-  // Struktur: postCoordinates[lag][post] = {lat, lon} - Trenger gjeldene siffer
+  // Struktur: postCoordinates[lag][post] = {lat, lon} - Trenger 5 gjeldene siffer for 1m nøyaktighet - 4 siffer gir 10m
   const postCoordinates = {
     "Lag 1": {
       "Post 1": { lat: 59.91121, lon: 10.64012 },
@@ -62,7 +64,7 @@
       "Post 5": { lat: 59.9148, lon: 10.63539 }
     },
     "Lag 3": {
-     "Post 1": { lat: 59.8964, lon: 10.4894 },
+     "Post 1": { lat: 59.8964, lon: 10.4894 },  // Hjemme
       "Post 2": { lat: 59.90833, lon: 10.64042 },
       "Post 3": { lat: 59.911, lon: 10.64145 },
       "Post 4": { lat: 59.91391, lon: 10.63467 },
@@ -143,13 +145,27 @@
     "Post 5": "Koden er: 1605"
   };
 
-  const maxDistanceMeters = 10;
+  const maxDistanceMeters = 600;
 
   function checkPosition() {
     const team = document.getElementById("team").value;
     const post = document.getElementById("post").value;
     const msg = document.getElementById("message");
     const questionBox = document.getElementById("question");
+
+    // Finn neste post
+    const postNum = parseInt(post.split(" ")[1]);
+    const nextPostKey = "Post " + (postNum + 1);
+    const nextPost = postCoordinates[team][nextPostKey];
+
+    if (nextPost) {
+      const nextInfo = `Neste post (${nextPostKey}): Lat ${nextPost.lat.toFixed(5)}, Lon ${nextPost.lon.toFixed(5)}`;
+      document.getElementById("nextCoords").innerText = nextInfo;
+    } else {
+      document.getElementById("nextCoords").innerText = "Dette var siste post! Møllefossen neste :-)";
+    }
+
+
 
     msg.innerText = "";
     questionBox.innerText = "";
@@ -205,7 +221,10 @@
   }
 </script>
 
-  
-  
+
+<p style="margin-top: 10em;">Servive is provided by:</p>
+<p>Quiz-qvas will make you jump - Production ltd.</p>
+<p>Part of Artleia Group</p>
+
 </body>
 </html>

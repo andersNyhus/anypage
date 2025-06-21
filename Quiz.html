@@ -1,98 +1,76 @@
-
 <!DOCTYPE html>
 <html lang="no">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quiz Post</title>
-    <style>
-        body {{ font-family: Arial, sans-serif; padding: 2em; background-color: #f9f9f9; }}
-        .hidden {{ display: none; }}
-        .question-box {{ margin-top: 2em; padding: 1em; background: white; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }}
-        label, select, button {{ display: block; margin: 1em 0; }}
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Lagkode – Sommerquiz</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #e0f7fa;
+      color: #004d40;
+    }
+
+    .container {
+      padding: 20px;
+      max-width: 600px;
+      margin: auto;
+    }
+
+    .back-button {
+      display: inline-block;
+      margin: 15px 0 25px;
+      padding: 10px 15px;
+      background-color: #00796b;
+      color: white;
+      text-decoration: none;
+      border-radius: 6px;
+      font-weight: bold;
+      transition: background-color 0.3s;
+    }
+
+    .back-button:hover {
+      background-color: #004d40;
+    }
+
+    h1 {
+      text-align: center;
+      color: #00796b;
+    }
+
+    .content {
+      margin-top: 20px;
+    }
+  </style>
 </head>
 <body>
-    <h1>Quizløype</h1>
-    <p>Velg post og lag:</p>
+  <div class="container">
+    <a class="back-button" href="https://andersnyhus.github.io/anypage/">← Tilbake til startside</a>
 
-    <label for="post">Post:</label>
-    <select id="post">
-        <option value="post1">Post 1</option>
-        <option value="post2">Post 2</option>
-        <option value="post3">Post 3</option>
-        <option value="post4">Post 4</option>
-    </select>
+    <h1>Finn lagkoden</h1>
 
-    <label for="lag">Lag:</label>
-    <select id="lag">
-        <option value="Lag 1">Lag 1</option>
-        <option value="Lag 2">Lag 2</option>
-        <option value="Lag 3">Lag 3</option>
-        <option value="Lag 4">Lag 4</option>
-        <option value="Lag 5">Lag 5</option>
-        <option value="Lag 6">Lag 6</option>
-    </select>
+    <div class="content">
+      <!-- Her er innholdet ditt fra før. Du kan lime inn scriptet/innholdet ditt her -->
+      <p>Denne siden gir deg lagkoden basert på posisjonen din. Sørg for at du har aktivert posisjonstjenester på telefonen!</p>
 
-    <button onclick="checkLocation()">Sjekk posisjon</button>
-
-    <div id="status"></div>
-
-    <div id="question" class="question-box hidden">
-        <h2>Spørsmål</h2>
-        <p>Hvilket år ble firmaet stiftet?</p>
-        <input type="text" placeholder="Svar her...">
+      <!-- Eksempel på hvordan du kan fortsette -->
+      <script>
+        // Eksempel: Lokasjonskode-innhold
+        navigator.geolocation.getCurrentPosition(function(position) {
+          const lat = position.coords.latitude;
+          const lon = position.coords.longitude;
+          const result = document.createElement('p');
+          result.textContent = `Din posisjon: ${lat.toFixed(5)}, ${lon.toFixed(5)}`;
+          document.querySelector('.content').appendChild(result);
+        }, function(error) {
+          const errorMsg = document.createElement('p');
+          errorMsg.textContent = "Kunne ikke hente posisjon. Sørg for at du har gitt tilgang.";
+          document.querySelector('.content').appendChild(errorMsg);
+        });
+      </script>
     </div>
-
-    <script>
-        const postCoords = {{
-            "post1": {{ lat: 59.9139, lng: 10.7522 }},  // Oslo sentrum
-            "post2": {{ lat: 60.3913, lng: 5.3221 }},   // Bergen
-            "post3": {{ lat: 63.4305, lng: 10.3951 }},  // Trondheim
-            "post4": {{ lat: 58.9690, lng: 5.7331 }}    // Stavanger
-        }};
-
-        const radiusMeters = 50; // hvor nære man må være posten
-
-        function getDistance(lat1, lon1, lat2, lon2) {{
-            const R = 6371e3; // meters
-            const φ1 = lat1 * Math.PI/180;
-            const φ2 = lat2 * Math.PI/180;
-            const Δφ = (lat2-lat1) * Math.PI/180;
-            const Δλ = (lon2-lon1) * Math.PI/180;
-
-            const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
-                      Math.cos(φ1) * Math.cos(φ2) *
-                      Math.sin(Δλ/2) * Math.sin(Δλ/2);
-            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-
-            return R * c;
-        }}
-
-        function checkLocation() {{
-            const selectedPost = document.getElementById("post").value;
-            const status = document.getElementById("status");
-            const questionBox = document.getElementById("question");
-            status.innerText = "Henter posisjon...";
-
-            navigator.geolocation.getCurrentPosition(position => {{
-                const userLat = position.coords.latitude;
-                const userLng = position.coords.longitude;
-
-                const target = postCoords[selectedPost];
-                const dist = getDistance(userLat, userLng, target.lat, target.lng);
-
-                if (dist <= radiusMeters) {{
-                    status.innerText = "Du er på riktig sted!";
-                    questionBox.classList.remove("hidden");
-                }} else {{
-                    status.innerText = `Du er ${Math.round(dist)} meter unna. Gå nærmere posten.`;
-                    questionBox.classList.add("hidden");
-                }}
-            }}, () => {{
-                status.innerText = "Klarte ikke hente posisjon. Sørg for at du har gitt tilgang.";
-            }});
-        }}
-    </script>
+  </div>
 </body>
 </html>

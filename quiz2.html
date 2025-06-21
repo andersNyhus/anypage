@@ -40,10 +40,10 @@
 
   <button onclick="checkPosition()">Sjekk posisjon</button>
 
-  <div id="message"></div>
-  <div id="question"></div>
+  <div id="message" style="margin-top: 2em;"></div>
   <div id="question" style="margin-top: 2em;"></div>
   <div id="nextCoords" style="margin-top: 1em; font-style: italic;"></div>
+
 
 
 <script>
@@ -138,11 +138,11 @@
   };
 
   const quizQuestions = {
-    "Post 1": "Tipp tipp tommel opp!",
+    "Post 1": "Koden er: 1605",
     "Post 2": "Koden er: 2107",
     "Post 3": "Koden er: 1911",
     "Post 4": "Koden er: 0306",
-    "Post 5": "Koden er: 1605"
+    "Post 5": "Koden er: 1111"
   };
 
   const maxDistanceMeters = 600;
@@ -159,13 +159,13 @@
     const nextPost = postCoordinates[team][nextPostKey];
 
     if (nextPost) {
-      const nextInfo = `Neste post (${nextPostKey}): Lat ${nextPost.lat.toFixed(5)}, Lon ${nextPost.lon.toFixed(5)}`;
+      const nextInfo = `Neste post er ${nextPostKey}: Lat ${nextPost.lat.toFixed(5)}, Lon ${nextPost.lon.toFixed(5)}`;
       document.getElementById("nextCoords").innerText = nextInfo;
     } else {
-      document.getElementById("nextCoords").innerText = "Dette var siste post! Møllefossen neste :-)";
+      document.getElementById("nextCoords").innerText = "Dette er siste post! Møllefossen neste :-)";
     }
 
-
+    
 
     msg.innerText = "";
     questionBox.innerText = "";

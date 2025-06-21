@@ -56,21 +56,195 @@
       <p>Denne siden gir deg lagkoden basert på posisjonen din. Sørg for at du har aktivert posisjonstjenester på telefonen!</p>
 
       <!-- Eksempel på hvordan du kan fortsette -->
-      <script>
-        // Eksempel: Lokasjonskode-innhold
-        navigator.geolocation.getCurrentPosition(function(position) {
-          const lat = position.coords.latitude;
-          const lon = position.coords.longitude;
-          const result = document.createElement('p');
-          result.textContent = `Din posisjon: ${lat.toFixed(5)}, ${lon.toFixed(5)}`;
-          document.querySelector('.content').appendChild(result);
-        }, function(error) {
-          const errorMsg = document.createElement('p');
-          errorMsg.textContent = "Kunne ikke hente posisjon. Sørg for at du har gitt tilgang.";
-          document.querySelector('.content').appendChild(errorMsg);
-        });
-      </script>
+      
+          
     </div>
   </div>
+  
+  
+  <script>
+  // Struktur: postCoordinates[lag][post] = {lat, lon} - Trenger 5 gjeldene siffer for 1m nøyaktighet - 4 siffer gir 10m
+  const postCoordinates = {
+    "Lag 1": {
+      "Post 1": { lat: 59.91121, lon: 10.64012 },
+      "Post 2": { lat: 59.90734, lon: 10.64204 },
+      "Post 3": { lat: 59.90945, lon: 10.64283 },
+      "Post 4": { lat: 59.91335, lon: 10.6398 },
+      "Post 5": { lat: 59.91451, lon: 10.6351 }
+    },
+    "Lag 2": {
+      "Post 1": { lat: 59.911, lon: 10.64 },  // Mitt kontor
+      "Post 2": { lat: 59.90766, lon: 10.64204 },
+      "Post 3": { lat: 59.91018, lon: 10.64215 },
+      "Post 4": { lat: 59.91328, lon: 10.63892 },
+      "Post 5": { lat: 59.9148, lon: 10.63539 }
+    },
+    "Lag 3": {
+     "Post 1": { lat: 59.8964, lon: 10.4894 },  // Hjemme
+      "Post 2": { lat: 59.90833, lon: 10.64042 },
+      "Post 3": { lat: 59.911, lon: 10.64145 },
+      "Post 4": { lat: 59.91391, lon: 10.63467 },
+      "Post 5": { lat: 59.91507, lon: 10.636 }
+    },
+    "Lag 4": {
+      "Post 1": { lat: 59.91121, lon: 10.64012 },
+      "Post 2": { lat: 59.90947, lon: 10.64286 },
+      "Post 3": { lat: 59.91173, lon: 10.64137 },
+      "Post 4": { lat: 59.91459, lon: 10.6336 },
+      "Post 5": { lat: 59.91525, lon: 10.63585 }
+    },
+    "Lag 5": {
+      "Post 1": { lat: 59.91121, lon: 10.64012 },
+      "Post 2": { lat: 59.90945, lon: 10.64233 },
+      "Post 3": { lat: 59.91237, lon: 10.64106 },
+      "Post 4": { lat: 59.91461, lon: 10.63511 },
+      "Post 5": { lat: 59.91489, lon: 10.63708 }
+    },
+    "Lag 6": {
+      "Post 1": { lat: 59.91121, lon: 10.64012 },
+      "Post 2": { lat: 59.90803, lon: 10.64145 },
+      "Post 3": { lat: 59.91334, lon: 10.63987 },
+      "Post 4": { lat: 59.91488, lon: 10.63557 },
+      "Post 5": { lat: 59.91547, lon: 10.6344 }
+    },
+    "Lag 7": {
+      "Post 1": { lat: 59.91121, lon: 10.64012 },
+      "Post 2": { lat: 59.90974, lon: 10.64114 },
+      "Post 3": { lat: 59.91267, lon: 10.63648 },
+      "Post 4": { lat: 59.91522, lon: 10.6362 },
+      "Post 5": { lat: 59.91484, lon: 10.63545 }
+    },
+    "Lag 8": {
+      "Post 1": { lat: 59.91121, lon: 10.64012 },
+      "Post 2": { lat: 59.9104, lon: 10.64078 },
+      "Post 3": { lat: 59.91255, lon: 10.63572 },
+      "Post 4": { lat: 59.91527, lon: 10.63594 },
+      "Post 5": { lat: 59.91474, lon: 10.63521 }
+    },
+    "Lag 9": {
+      "Post 1": { lat: 59.91121, lon: 10.64012 },
+      "Post 2": { lat: 59.91177, lon: 10.64124 },
+      "Post 3": { lat: 59.91281, lon: 10.64139 },
+      "Post 4": { lat: 59.91589, lon: 10.63764 },
+      "Post 5": { lat: 59.91551, lon: 10.63639 }
+    },
+    "Lag 10": {
+      "Post 1": { lat: 59.91121, lon: 10.64012 },
+      "Post 2": { lat: 59.90912, lon: 10.64264 },
+      "Post 3": { lat: 59.91248, lon: 10.64177 },
+      "Post 4": { lat: 59.91534, lon: 10.63733 },
+      "Post 5": { lat: 59.91524, lon: 10.63611 }
+    },
+    "Lag 11": {
+      "Post 1": { lat: 59.91121, lon: 10.64012 },
+      "Post 2": { lat: 59.90999, lon: 10.64242 },
+      "Post 3": { lat: 59.91315, lon: 10.6414 },
+      "Post 4": { lat: 59.91564, lon: 10.63867 },
+      "Post 5": { lat: 59.91534, lon: 10.63731 }
+    },
+    "Lag 12": {
+      "Post 1": { lat: 59.91121, lon: 10.64012 },
+      "Post 2": { lat: 59.91052, lon: 10.64187 },
+      "Post 3": { lat: 59.91306, lon: 10.64201 },
+      "Post 4": { lat: 59.91597, lon: 10.63831 },
+      "Post 5": { lat: 59.91569, lon: 10.63697 }
+    },
+        
+    // Legg til Lag 3–12 her på samme måte
+  };
+
+  const quizQuestions = {
+    "Post 1": "Koden er: 1605",
+    "Post 2": "Koden er: 2107",
+    "Post 3": "Koden er: 1911",
+    "Post 4": "Koden er: 0306",
+    "Post 5": "Koden er: 1111"
+  };
+
+  const maxDistanceMeters = 600;
+
+  function checkPosition() {
+    const team = document.getElementById("team").value;
+    const post = document.getElementById("post").value;
+    const msg = document.getElementById("message");
+    const questionBox = document.getElementById("question");
+
+    // Finn neste post
+    const postNum = parseInt(post.split(" ")[1]);
+    const nextPostKey = "Post " + (postNum + 1);
+    const nextPost = postCoordinates[team][nextPostKey];
+
+    const nextCoordsDiv = document.getElementById("nextCoords");
+
+    if (nextPost) {
+      const lat = nextPost.lat.toFixed(5);
+      const lon = nextPost.lon.toFixed(5);
+      const nextInfo = `Neste post (${nextPostKey}): Lat ${lat}, Lon ${lon}`;
+      const gmapLink = `https://www.google.com/maps?q=${lat},${lon}`;
+      nextCoordsDiv.innerHTML = `
+        <p>${nextInfo}</p>
+        <p><a href="${gmapLink}" target="_blank">Vis i Google Maps</a></p>
+      `;
+    } else {
+      nextCoordsDiv.innerHTML = `<p>Dette var siste post!</p>`;
+    }
+
+    
+
+    msg.innerText = "";
+    questionBox.innerText = "";
+
+    if (!team || !post) {
+      msg.innerText = "Velg både lag og post.";
+      return;
+    }
+
+    if (!postCoordinates[team] || !postCoordinates[team][post]) {
+      msg.innerText = "Ingen lokasjon definert for dette laget og denne posten.";
+      return;
+    }
+
+    if (!navigator.geolocation) {
+      msg.innerText = "Geolokasjon støttes ikke av nettleseren.";
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      function(position) {
+        const userLat = position.coords.latitude;
+        const userLon = position.coords.longitude;
+        const target = postCoordinates[team][post];
+
+        const dist = distanceInMeters(userLat, userLon, target.lat, target.lon);
+
+        if (dist <= maxDistanceMeters) {
+          questionBox.innerText = quizQuestions[post] || "Ingen spørsmål definert.";
+        } else {
+          msg.innerText = `Du er ${Math.round(dist)} meter unna riktig posisjon. Gå nærmere posten.`;
+        }
+      },
+      function(error) {
+        msg.innerText = "Klarte ikke hente posisjon: " + error.message;
+      }
+    );
+  }
+
+  function distanceInMeters(lat1, lon1, lat2, lon2) {
+    const R = 6371000;
+    const φ1 = lat1 * Math.PI / 180;
+    const φ2 = lat2 * Math.PI / 180;
+    const Δφ = (lat2 - lat1) * Math.PI / 180;
+    const Δλ = (lon2 - lon1) * Math.PI / 180;
+
+    const a = Math.sin(Δφ / 2) ** 2 +
+              Math.cos(φ1) * Math.cos(φ2) *
+              Math.sin(Δλ / 2) ** 2;
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+    return R * c;
+  }
+</script>
+
+
 </body>
 </html>

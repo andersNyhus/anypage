@@ -158,11 +158,19 @@
     const nextPostKey = "Post " + (postNum + 1);
     const nextPost = postCoordinates[team][nextPostKey];
 
+    const nextCoordsDiv = document.getElementById("nextCoords");
+
     if (nextPost) {
-      const nextInfo = `Neste post er ${nextPostKey}: Lat ${nextPost.lat.toFixed(5)}, Lon ${nextPost.lon.toFixed(5)}`;
-      document.getElementById("nextCoords").innerText = nextInfo;
+      const lat = nextPost.lat.toFixed(5);
+      const lon = nextPost.lon.toFixed(5);
+      const nextInfo = `Neste post (${nextPostKey}): Lat ${lat}, Lon ${lon}`;
+      const gmapLink = `https://www.google.com/maps?q=${lat},${lon}`;
+      nextCoordsDiv.innerHTML = `
+        <p>${nextInfo}</p>
+        <p><a href="${gmapLink}" target="_blank">Vis i Google Maps</a></p>
+      `;
     } else {
-      document.getElementById("nextCoords").innerText = "Dette er siste post! Møllefossen neste :-)";
+      nextCoordsDiv.innerHTML = `<p>Dette var siste post!</p>`;
     }
 
     

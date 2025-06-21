@@ -56,7 +56,39 @@
       <p>Denne siden gir deg lagkoden basert på posisjonen din. Sørg for at du har aktivert posisjonstjenester på telefonen!</p>
 
       <!-- Eksempel på hvordan du kan fortsette -->
-      
+        <h2>Quizløype - På rett sted?</h2>
+  <label for="team">Velg lag:</label>
+  <select id="team">
+    <option value="">-- Velg lag --</option>
+    <option value="Lag 1">Lag 1</option>
+    <option value="Lag 2">Lag 2</option>
+    <option value="Lag 3">Lag 3</option>
+    <option value="Lag 4">Lag 4</option>
+    <option value="Lag 5">Lag 5</option>
+    <option value="Lag 6">Lag 6</option>
+    <option value="Lag 7">Lag 7</option>
+    <option value="Lag 8">Lag 8</option>
+    <option value="Lag 9">Lag 9</option>
+    <option value="Lag 10">Lag 10</option>
+    <option value="Lag 11">Lag 11</option>
+    <option value="Lag 12">Lag 12</option>
+  </select>
+
+  <label for="post">Velg post:</label>
+  <select id="post">
+    <option value="">-- Velg post --</option>
+    <option value="Post 1">Post 1</option>
+    <option value="Post 2">Post 2</option>
+    <option value="Post 3">Post 3</option>
+    <option value="Post 4">Post 4</option>
+    <option value="Post 5">Post 5</option>
+  </select>
+
+  <button onclick="checkPosition()">Sjekk posisjon</button>
+
+  <div id="message" style="margin-top: 2em;"></div>
+  <div id="question" style="margin-top: 2em;"></div>
+  <div id="nextCoords" style="margin-top: 1em; font-style: italic;"></div>
           
     </div>
   </div>

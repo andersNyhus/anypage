@@ -43,6 +43,7 @@
     .content {
       margin-top: 20px;
     }
+	#question { font-weight: bold; }
   </style>
 </head>
 <body>
@@ -53,10 +54,12 @@
 
     <div class="content">
       <!-- Her er innholdet ditt fra før. Du kan lime inn scriptet/innholdet ditt her -->
-      <p>Denne siden gir deg lagkoden basert på posisjonen din. Sørg for at du har aktivert posisjonstjenester på telefonen!</p>
+      <p>Er dere på rett sted?</p>
+	  <p>Denne siden gir deg lagkoden basert på posisjonen din. Sørg for at du har aktivert posisjonstjenester på telefonen!</p>
+	  <p>All lag har unike lokasjoner, velg ditt lag og posten du skal til. Om dere er på rett sted får dere kode under, samt koordinater til neste post. Benytt koden for å låse opp sprørreskjemaet.</p>
+	  <p>Har der glemt hvor dere skulle, fortvil ikke. Velg forrige post, og lokasjon vil vises under "neste post".</p>
 
-      <!-- Eksempel på hvordan du kan fortsette -->
-        <h2>Quizløype - På rett sted?</h2>
+ 
   <label for="team">Velg lag:</label>
   <select id="team">
     <option value="">-- Velg lag --</option>
@@ -72,7 +75,7 @@
     <option value="Lag 10">Lag 10</option>
     <option value="Lag 11">Lag 11</option>
     <option value="Lag 12">Lag 12</option>
-  </select>
+  </select><br><br>
 
   <label for="post">Velg post:</label>
   <select id="post">
@@ -82,13 +85,14 @@
     <option value="Post 3">Post 3</option>
     <option value="Post 4">Post 4</option>
     <option value="Post 5">Post 5</option>
-  </select>
+  </select> <br><br>
 
-  <button onclick="checkPosition()">Sjekk posisjon</button>
+  <a class="back-button" onclick="checkPosition()">Sjekk posisjon</a>
+
 
   <div id="message" style="margin-top: 2em;"></div>
   <div id="question" style="margin-top: 2em;"></div>
-  <div id="nextCoords" style="margin-top: 1em; font-style: italic;"></div>
+  <div id="nextCoords" style="margin-top: 2em; font-style: italic;"></div>
           
     </div>
   </div>
@@ -193,7 +197,7 @@
     "Post 5": "Koden er: 1111"
   };
 
-  const maxDistanceMeters = 600;
+  const maxDistanceMeters = 50;
 
   function checkPosition() {
     const team = document.getElementById("team").value;
@@ -211,14 +215,14 @@
     if (nextPost) {
       const lat = nextPost.lat.toFixed(5);
       const lon = nextPost.lon.toFixed(5);
-      const nextInfo = `Neste post (${nextPostKey}): Lat ${lat}, Lon ${lon}`;
+      const nextInfo = `Når dere har levert svar på spørsmålene, så er finner dere neste post her:<br>Neste post - ${nextPostKey}: Lat ${lat}, Lon ${lon}`;
       const gmapLink = `https://www.google.com/maps?q=${lat},${lon}`;
       nextCoordsDiv.innerHTML = `
         <p>${nextInfo}</p>
         <p><a href="${gmapLink}" target="_blank">Vis i Google Maps</a></p>
       `;
     } else {
-      nextCoordsDiv.innerHTML = `<p>Dette var siste post!</p>`;
+      nextCoordsDiv.innerHTML = `<p>Dette er siste post!<br>Møllefossen neste! 🍺</p>`;
     }
 
     

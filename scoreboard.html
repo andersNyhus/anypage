@@ -87,11 +87,13 @@
       const data = rows.map(row => ({ lag: row[0], poeng: parseFloat(row[1]) }));
       const top5 = data.sort((a, b) => b.poeng - a.poeng).slice(0, 5);
 
+      const top12 = data.sort((a, b) => b.poeng - a.poeng).slice(0, 12);
+
       const labels = top5.map(e => e.lag);
       const values = top5.map(e => e.poeng);
 
       drawChart(labels, values);
-      drawTable(top5);
+      drawTable(top12);
     }
 
     function drawChart(labels, values) {

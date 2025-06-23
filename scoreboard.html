@@ -2,43 +2,68 @@
 <html lang="no">
 <head>
   <meta charset="UTF-8">
-  <title>Quizresultater</title>
+  <title>Toppliste – Quiz</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     body { font-family: Arial, sans-serif; margin: 40px; }
     h1 { color: steelblue; }
-    table { border-collapse: collapse; width: 100%; }
-    th, td { border: 1px solid #bbb; padding: 8px; text-align: center; }
-    th { background: #eee; }
-    tr:nth-child(even) { background: #f9f9f9; }
+    canvas { max-width: 600px; margin: 30px auto; display: block; }
   </style>
 </head>
 <body>
-  <h1>Quizresultater – live</h1>
-  <table id="results">
-    <thead><tr id="header"></tr></thead>
-    <tbody></tbody>
-  </table>
+  <h1>Toppliste – Quizresultater</h1>
+  <canvas id="scoreChart"></canvas>
 
   <script>
-    async function fetchResults() {
-      const id = '1Y1IlCc7Rdr4eP29OtzfeuFMzyw2j9JBRjLM5hUA3wzQ';
-      const url = `https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:json`;
+    async function fetchChartData() {
+      const sheetId = '1Y1IlCc7Rdr4eP29OtzfeuFMzyw2j9JBRjLM5hUA3wzQ';
+      const sheetName = 'Scoreboard';
+      const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json&sheet=${sheetName}`;
+
       const res = await fetch(url);
       const text = await res.text();
       const json = JSON.parse(text.substr(47).slice(0, -2));
-      
-      const cols = json.table.cols.map(c => c.label);
+
       const rows = json.table.rows.map(r => r.c.map(c => c?.v ?? ""));
-      
-      const header = document.getElementById('header');
-      header.innerHTML = cols.map(h => `<th>${h}</th>`).join('');
-      
-      const body = document.querySelector('#results tbody');
-      body.innerHTML = rows.map(row => 
-        `<tr>${row.map(val => `<td>${val}</td>`).join('')}</tr>`).join('');
+
+      // Forvent at første kolonne er "Lag", andre er "Poeng"
+      const data = rows.map(row => ({ lag: row[0], poeng: parseFloat(row[1]) }));
+
+      // Sorter og hent topp 5
+      const top5 = data.sort((a, b) => b.poeng - a.poeng).slice(0, 5);
+
+      const labels = top5.map(e => e.lag);
+      const values = top5.map(e => e.poeng);
+
+      drawChart(labels, values);
     }
 
-    window.addEventListener('DOMContentLoaded', fetchResults);
+    function drawChart(labels, values) {
+      new Chart(document.getElementById('scoreChart'), {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Poeng',
+            data: values,
+            backgroundColor: 'steelblue',
+            borderRadius: 4
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { display: false },
+            title: { display: false }
+          },
+          scales: {
+            y: { beginAtZero: true, stepSize: 1 }
+          }
+        }
+      });
+    }
+
+    window.addEventListener('DOMContentLoaded', fetchChartData);
   </script>
 </body>
 </html>

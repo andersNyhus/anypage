@@ -60,17 +60,18 @@
 <body>
   <div class="container">
     <a class="back-button" href="https://andersnyhus.github.io/anypage/">← Tilbake til startside</a>
-  </div>
-  <h1>Toppliste – Quizresultater</h1>
-  <canvas id="scoreChart"></canvas>
+  
+    <h2>Topp 5</h2>
+    <canvas id="scoreChart"></canvas>
 
-  <h2>Poengoversikt</h2>
-  <table id="resultTable">
-    <thead>
-      <tr><th>Lag</th><th>Poeng</th></tr>
-    </thead>
-    <tbody></tbody>
-  </table>
+    <h2>Poengoversikt</h2>
+    <table id="resultTable">
+      <thead>
+        <tr><th>Lag</th><th>Post 2</th><th>Sum</th></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
 
   <script>
     async function fetchChartData() {

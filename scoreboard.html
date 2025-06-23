@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8">
+  <title>Quizresultater</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 40px; }
+    h1 { color: steelblue; }
+    table { border-collapse: collapse; width: 100%; }
+    th, td { border: 1px solid #bbb; padding: 8px; text-align: center; }
+    th { background: #eee; }
+    tr:nth-child(even) { background: #f9f9f9; }
+  </style>
+</head>
+<body>
+  <h1>Quizresultater – live</h1>
+  <table id="results">
+    <thead><tr id="header"></tr></thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    async function fetchResults() {
+      const id = '1Y1IlCc7Rdr4eP29OtzfeuFMzyw2j9JBRjLM5hUA3wzQ';
+      const url = `https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:json`;
+      const res = await fetch(url);
+      const text = await res.text();
+      const json = JSON.parse(text.substr(47).slice(0, -2));
+      
+      const cols = json.table.cols.map(c => c.label);
+      const rows = json.table.rows.map(r => r.c.map(c => c?.v ?? ""));
+      
+      const header = document.getElementById('header');
+      header.innerHTML = cols.map(h => `<th>${h}</th>`).join('');
+      
+      const body = document.querySelector('#results tbody');
+      body.innerHTML = rows.map(row => 
+        `<tr>${row.map(val => `<td>${val}</td>`).join('')}</tr>`).join('');
+    }
+
+    window.addEventListener('DOMContentLoaded', fetchResults);
+  </script>
+</body>
+</html>

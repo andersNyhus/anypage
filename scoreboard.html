@@ -67,7 +67,14 @@
     <h2>Poengoversikt</h2>
     <table id="resultTable">
       <thead>
-        <tr><th>Lag</th><th>Post 2</th><th>Sum</th></tr>
+        <tr>
+          <th>Lag</th>
+          <th>Post 2</th>
+          <th>Post 3</th>
+          <th>Post 4</th>
+          <th>Post 5</th>
+          <th>Sum</th>
+        </tr>
       </thead>
       <tbody></tbody>
     </table>
@@ -131,7 +138,7 @@
     function drawTable(data) {
       const tbody = document.querySelector('#resultTable tbody');
       tbody.innerHTML = data.map(row =>
-        `<tr><td>${row.Lag}</td><td>${row.Post_2}</td><td>${row.poeng}</td></tr>`
+        `<tr><td>${row.Lag}</td><td>${row.Post_2}</td><td>${row.Post_3}</td><td>${row.Post_4}</td><td>${row.Post_5}</td><td>${row.poeng}</td></tr>`
       ).join('');
     }
 

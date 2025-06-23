@@ -131,7 +131,7 @@
     function drawTable(data) {
       const tbody = document.querySelector('#resultTable tbody');
       tbody.innerHTML = data.map(row =>
-        `<tr><td>${row.Lag}</td><td>${Post_2.poeng}</td><td>${row.poeng}</td></tr>`
+        `<tr><td>${row.Lag}</td><td>${row.Post_2}</td><td>${row.poeng}</td></tr>`
       ).join('');
     }
 

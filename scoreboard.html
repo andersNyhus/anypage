@@ -69,16 +69,27 @@
   <div class="container">
     <a class="back-button" href="https://andersnyhus.github.io/anypage/">← Tilbake til startside</a>
    
-    <h2>Topp 5</h2>
-    <canvas id="scoreChart"></canvas>
-
-    <h2>Poengoversikt</h2>
-     <p>Snu til skjermen for detaljert tabell</p>
     
-    <table id="resultTable">
-      <thead id="tableHeader"></thead>
-      <tbody></tbody>
-    </table>
+    <div style="text-align: center;">
+      <button onclick="showView('chart')">Vis graf</button>
+      <button onclick="showView('table')">Vis tabell</button>
+    </div>
+    
+    <div id="chartView">
+      <h2>Topp 5</h2>
+      <canvas id="scoreChart"></canvas>
+    </div>
+    
+    <div id="tableView" style="display: none;">
+      <h2>Poengoversikt</h2>
+      <table id="resultTable">
+        <thead id="tableHeader"></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+        
+
+
   </div>
 
   <script>
@@ -164,7 +175,11 @@
         `<tr>${columns.map(c => `<td>${row[c] ?? ""}</td>`).join("")}</tr>`
       ).join('');
     }
-      
+
+    function showView(view) {
+      document.getElementById('chartView').style.display = view === 'chart' ? 'block' : 'none';
+      document.getElementById('tableView').style.display = view === 'table' ? 'block' : 'none';
+    }
       
     window.addEventListener('DOMContentLoaded', fetchChartData);
   </script>

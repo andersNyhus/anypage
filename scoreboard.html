@@ -50,6 +50,12 @@
     .back-button:hover {
       background-color: #004d40;
     }
+
+    @media screen and (orientation: landscape) {
+      #scoreChart {
+        display: none;
+      }
+    }
     
     canvas { max-width: 600px; margin: 30px auto; display: block; }
     table { border-collapse: collapse; margin: 0px auto; width: 95%; }
@@ -58,25 +64,19 @@
     tr:nth-child(even) { background: #f9f9f9; }
   </style>
 </head>
+
 <body>
   <div class="container">
     <a class="back-button" href="https://andersnyhus.github.io/anypage/">← Tilbake til startside</a>
-  
+   
     <h2>Topp 5</h2>
     <canvas id="scoreChart"></canvas>
 
     <h2>Poengoversikt</h2>
+     <p>Snu til skjermen for detaljert tabell</p>
+    
     <table id="resultTable">
-      <thead>
-        <tr>
-          <th>Lag</th>
-          <th>Post 2</th>
-          <th>Post 3</th>
-          <th>Post 4</th>
-          <th>Post 5</th>
-          <th>Sum</th>
-        </tr>
-      </thead>
+      <thead id="tableHeader"></thead>
       <tbody></tbody>
     </table>
   </div>
@@ -99,7 +99,9 @@
         Post_3: parseFloat(row[2]),
         Post_4: parseFloat(row[3]),
         Post_5: parseFloat(row[4]),
-        poeng: parseFloat(row[5])
+        poeng: parseFloat(row[5]),
+        Navn: row[6],
+        Juks: row[7]
       }));
       
       const top5 = data.sort((a, b) => b.poeng - a.poeng).slice(0, 5);
@@ -137,12 +139,33 @@
     }
 
     function drawTable(data) {
-      const tbody = document.querySelector('#resultTable tbody');
+      const isLandscape = window.matchMedia("(orientation: landscape)").matches;
+      const columns = isLandscape
+        ? ["Lag", "Navn", "Post_2", "Post_3", "Post_4", "Post_5", "Sunm", "Juks"]
+        : ["Lag", "Post_2", "Post_3", "Post_4", "Post_5", "Sum"];
+
+        // Sett opp kolonne-overskrifter
+      const headerMap = {
+        Lag: "Lag",
+        Navn: "Lag",
+        Post_2: "Post 2",
+        Post_3: "Post 3",
+        Post_4: "Post 4",
+        Post_5: "Post 5",
+        Sum: "Sum",
+        Juks: "QC"
+      };
+
+      const thead = document.getElementById("tableHeader");
+      thead.innerHTML = `<tr>${columns.map(c => `<th>${headerMap[c]}</th>`).join("")}</tr>`;
+
+      const tbody = document.querySelector("#resultTable tbody");
       tbody.innerHTML = data.map(row =>
-        `<tr><td>${row.Lag}</td><td>${row.Post_2}</td><td>${row.Post_3}</td><td>${row.Post_4}</td><td>${row.Post_5}</td><td>${row.poeng}</td></tr>`
+        `<tr>${columns.map(c => `<td>${row[c] ?? ""}</td>`).join("")}</tr>`
       ).join('');
     }
-
+      
+      
     window.addEventListener('DOMContentLoaded', fetchChartData);
   </script>
 </body>

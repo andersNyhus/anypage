@@ -141,8 +141,8 @@
     function drawTable(data) {
       const isLandscape = window.matchMedia("(orientation: landscape)").matches;
       const columns = isLandscape
-        ? ["Lag", "Navn", "Post_2", "Post_3", "Post_4", "Post_5", "Sunm", "Juks"]
-        : ["Lag", "Post_2", "Post_3", "Post_4", "Post_5", "Sum"];
+        ? ["Lag", "Navn", "Post_2", "Post_3", "Post_4", "Post_5", "poeng", "Juks"]
+        : ["Lag", "Post_2", "Post_3", "Post_4", "Post_5", "poeng"];
 
         // Sett opp kolonne-overskrifter
       const headerMap = {
@@ -152,7 +152,7 @@
         Post_3: "Post 3",
         Post_4: "Post 4",
         Post_5: "Post 5",
-        Sum: "Sum",
+        poeng: "Sum",
         Juks: "QC"
       };
 

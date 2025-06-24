@@ -67,6 +67,7 @@
     <div style="text-align: center;">
       <a class="back-button" onclick="showView('chart')">Graf - Topp 5</a>
       <a class="back-button" onclick="showView('table')">Tabell - alle lag</a>
+      <a class="back-button" onclick="showView('detailed')">Detaljert visning</a>
     </div>
     
     <div id="chartView">
@@ -81,7 +82,14 @@
         <tbody></tbody>
       </table>
     </div>
-        
+   <div id="detailedView" style="display: none;">
+    <h2>Detaljert resultat</h2>
+    <p>Vises best i landscape</p>
+    <table id="detailedTable">
+      <thead id="detailedHeader"></thead>
+      <tbody></tbody>
+    </table>
+  </div>     
 
 
   </div>
@@ -117,6 +125,7 @@
 
       drawChart(labels, values);
       drawTable(top13);
+      drawDetailedTable(top13);
     }
 
     function drawChart(labels, values) {
@@ -144,15 +153,19 @@
     }
 
     function drawTable(data) {
-      const isLandscape = window.matchMedia("(orientation: landscape)").matches;
-      const columns = isLandscape
-        ? ["Lag", "Navn", "Post_2", "Post_3", "Post_4", "Post_5", "poeng", "Juks"]
-        : ["Lag", "Post_2", "Post_3", "Post_4", "Post_5", "poeng"];
-
-        // Sett opp kolonne-overskrifter
+      const columns = ["Lag", "Post_2", "Post_3", "Post_4", "Post_5", "poeng"];
+      renderTable("resultTable", "tableHeader", data, columns);
+    }
+    
+    function drawDetailedTable(data) {
+      const columns = ["Lag", "Navn", "Post_2", "Post_3", "Post_4", "Post_5", "poeng", "Juks"];
+      renderTable("detailedTable", "detailedHeader", data, columns);
+    }
+    
+    function renderTable(tableId, headerId, data, columns) {
       const headerMap = {
         Lag: "Lag",
-        Navn: "Lag",
+        Navn: "Navn",
         Post_2: "Post 2",
         Post_3: "Post 3",
         Post_4: "Post 4",
@@ -160,20 +173,23 @@
         poeng: "Sum",
         Juks: "QC"
       };
-
-      const thead = document.getElementById("tableHeader");
+    
+      const thead = document.getElementById(headerId);
       thead.innerHTML = `<tr>${columns.map(c => `<th>${headerMap[c]}</th>`).join("")}</tr>`;
-
-      const tbody = document.querySelector("#resultTable tbody");
+    
+      const tbody = document.getElementById(tableId).querySelector("tbody");
       tbody.innerHTML = data.map(row =>
         `<tr>${columns.map(c => `<td>${row[c] ?? ""}</td>`).join("")}</tr>`
       ).join('');
     }
 
+
     function showView(view) {
       document.getElementById('chartView').style.display = view === 'chart' ? 'block' : 'none';
       document.getElementById('tableView').style.display = view === 'table' ? 'block' : 'none';
+      document.getElementById('detailedView').style.display = view === 'detailed' ? 'block' : 'none';
     }
+
       
     window.addEventListener('DOMContentLoaded', fetchChartData);
   </script>

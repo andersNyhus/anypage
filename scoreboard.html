@@ -103,7 +103,7 @@
       }));
       
       const top5 = data.sort((a, b) => b.poeng - a.poeng).slice(0, 5);
-      const top12 = data.sort((a, b) => b.poeng - a.poeng).slice(0, 12);
+      const top13 = data.sort((a, b) => b.poeng - a.poeng).slice(0, 13);
 
       const labels = top5.map(e => e.Lag);
       const values = top5.map(e => e.poeng);

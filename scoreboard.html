@@ -84,7 +84,7 @@
     </div>
    <div id="detailedView" style="display: none;">
     <h2>Detaljert resultat</h2>
-    <p>Vises best i landscape</p>
+    <p>Roter skjerm for bedre visning</p>
     <table id="detailedTable">
       <thead id="detailedHeader"></thead>
       <tbody></tbody>
@@ -154,7 +154,11 @@
 
     function drawTable(data) {
       const columns = ["Lag", "Post_2", "Post_3", "Post_4", "Post_5", "poeng"];
-      renderTable("resultTable", "tableHeader", data, columns);
+      const modifiedData = data.map(row => ({
+        ...row,
+        Lag: row.Lag.replace(/^Lag\s*/i, "")  // Fjerner "Lag " i starten
+      }));
+      renderTable("resultTable", "tableHeader", modifiedData, columns);
     }
     
     function drawDetailedTable(data) {

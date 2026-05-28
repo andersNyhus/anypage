@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Decision Maker — Det Ultimate Demokrati</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1a2e;
+    --parchment: #f5f0e8;
+    --gold: #c9a84c;
+    --gold-light: #e8d49a;
+    --red: #c0392b;
+    --green: #27ae60;
+    --muted: #8a7f72;
+    --border: #d4c9b0;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--parchment);
+    color: var(--ink);
+    font-family: 'Space Mono', monospace;
+    min-height: 100vh;
+    background-image: 
+      radial-gradient(ellipse at 20% 50%, rgba(201,168,76,0.08) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 20%, rgba(192,57,43,0.05) 0%, transparent 50%),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4'%3E%3Crect width='4' height='4' fill='%23f5f0e8'/%3E%3Crect width='1' height='1' fill='%23e8e0cc' opacity='0.5'/%3E%3C/svg%3E");
+  }
+
+  .page {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+  }
+
+  /* HEADER */
+  header {
+    text-align: center;
+    padding: 40px 0 32px;
+    border-bottom: 2px solid var(--gold);
+    margin-bottom: 40px;
+    position: relative;
+  }
+
+  header::before, header::after {
+    content: '✦';
+    position: absolute;
+    bottom: -12px;
+    font-size: 18px;
+    color: var(--gold);
+    background: var(--parchment);
+    padding: 0 8px;
+  }
+  header::before { left: 20px; }
+  header::after { right: 20px; }
+
+  .eyebrow {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 12px;
+  }
+
+  h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(42px, 8vw, 72px);
+    font-weight: 900;
+    line-height: 0.95;
+    letter-spacing: -1px;
+    color: var(--ink);
+  }
+
+  .subtitle {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 16px;
+    color: var(--muted);
+    margin-top: 10px;
+  }
+
+  /* SECTION LABELS */
+  .section-label {
+    font-size: 9px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* VOTERS SECTION */
+  .voters-section { margin-bottom: 36px; }
+
+  .voters-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 16px;
+    min-height: 20px;
+  }
+
+  .voter-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    animation: slideIn 0.25s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .voter-row::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: var(--border);
+    transition: background 0.3s;
+  }
+  .voter-row.for::before { background: var(--green); }
+  .voter-row.mot::before { background: var(--red); }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(-8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .voter-name {
+    flex: 1;
+    font-size: 12px;
+    color: var(--ink);
+    letter-spacing: 0.5px;
+  }
+
+  /* TOGGLE */
+  .toggle-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .toggle-label {
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    width: 28px;
+    text-align: right;
+  }
+  .toggle-label.for-label { color: var(--green); }
+  .toggle-label.mot-label { color: var(--red); }
+
+  .toggle {
+    position: relative;
+    width: 52px;
+    height: 26px;
+    cursor: pointer;
+  }
+  .toggle input { display: none; }
+  .toggle-track {
+    position: absolute;
+    inset: 0;
+    background: var(--red);
+    border-radius: 13px;
+    transition: background 0.3s;
+  }
+  .toggle input:checked ~ .toggle-track { background: var(--green); }
+  .toggle-thumb {
+    position: absolute;
+    width: 20px; height: 20px;
+    background: white;
+    border-radius: 50%;
+    top: 3px; left: 3px;
+    transition: transform 0.3s;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+  }
+  .toggle input:checked ~ .toggle-thumb { transform: translateX(26px); }
+
+  .remove-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--border);
+    font-size: 16px;
+    line-height: 1;
+    padding: 2px 4px;
+    transition: color 0.2s;
+  }
+  .remove-btn:hover { color: var(--red); }
+
+  .add-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: none;
+    border: 1px dashed var(--border);
+    color: var(--muted);
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 1px;
+    padding: 10px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+    width: 100%;
+    text-transform: uppercase;
+  }
+  .add-btn:hover {
+    border-color: var(--gold);
+    color: var(--gold);
+    background: rgba(201,168,76,0.05);
+  }
+
+  /* IMPORTANCE SLIDER */
+  .importance-section { margin-bottom: 36px; }
+
+  .slider-wrap {
+    padding: 16px 0 8px;
+  }
+
+  .slider-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+  .slider-labels span {
+    font-size: 9px;
+    color: var(--muted);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  input[type=range] {
+    width: 100%;
+    appearance: none;
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    outline: none;
+    cursor: pointer;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    appearance: none;
+    width: 20px; height: 20px;
+    background: var(--gold);
+    border-radius: 50%;
+    box-shadow: 0 0 0 4px rgba(201,168,76,0.2);
+    transition: box-shadow 0.2s;
+  }
+  input[type=range]::-webkit-slider-thumb:hover {
+    box-shadow: 0 0 0 7px rgba(201,168,76,0.25);
+  }
+
+  .importance-display {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    margin-top: 12px;
+  }
+  .importance-number {
+    font-family: 'Playfair Display', serif;
+    font-size: 48px;
+    font-weight: 900;
+    color: var(--ink);
+    line-height: 1;
+  }
+  .importance-text {
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  /* VOTE BUTTON */
+  .vote-section { margin-bottom: 36px; }
+
+  .vote-btn {
+    width: 100%;
+    padding: 18px;
+    background: var(--ink);
+    color: var(--parchment);
+    border: none;
+    border-radius: 4px;
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-style: italic;
+    font-weight: 700;
+    cursor: pointer;
+    letter-spacing: 0.5px;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+  .vote-btn::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--gold);
+    transform: translateX(-100%);
+    transition: transform 0.3s;
+    mix-blend-mode: overlay;
+    opacity: 0.3;
+  }
+  .vote-btn:hover::after { transform: translateX(0); }
+  .vote-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .vote-btn:hover:not(:disabled) {
+    background: #0d0d1f;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(26,26,46,0.3);
+  }
+
+  /* COUNTING ANIMATION */
+  #counting-area {
+    display: none;
+    text-align: center;
+    padding: 40px 20px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    background: white;
+    margin-bottom: 24px;
+  }
+
+  .counting-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    font-style: italic;
+    color: var(--muted);
+    margin-bottom: 28px;
+  }
+
+  .drum-rolls {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 28px;
+    flex-wrap: wrap;
+  }
+
+  .drum {
+    width: 44px; height: 44px;
+    border: 2px solid var(--border);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--muted);
+    transition: all 0.15s;
+    background: white;
+  }
+  .drum.done {
+    border-color: var(--gold);
+    color: var(--ink);
+    background: rgba(201,168,76,0.08);
+  }
+  .drum.active {
+    border-color: var(--ink);
+    color: var(--ink);
+    animation: drumPulse 0.4s ease infinite;
+  }
+  @keyframes drumPulse {
+    0%, 100% { transform: scale(1); box-shadow: none; }
+    50% { transform: scale(1.1); box-shadow: 0 0 12px rgba(26,26,46,0.2); }
+  }
+
+  .random-ticker {
+    font-family: 'Playfair Display', serif;
+    font-size: 64px;
+    font-weight: 900;
+    color: var(--ink);
+    letter-spacing: -2px;
+    line-height: 1;
+    min-height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 8px;
+  }
+
+  .ticker-label {
+    font-size: 9px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  /* RESULT */
+  #result-area {
+    display: none;
+    animation: revealResult 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+
+  @keyframes revealResult {
+    from { opacity: 0; transform: scale(0.92) translateY(20px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+  }
+
+  .result-card {
+    border: 2px solid var(--ink);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+
+  .result-header {
+    padding: 12px 20px;
+    background: var(--ink);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .result-header-text {
+    font-size: 9px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--gold-light);
+  }
+
+  .result-body {
+    padding: 32px 28px;
+    text-align: center;
+  }
+
+  .result-verdict {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(56px, 12vw, 96px);
+    font-weight: 900;
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+  .result-verdict.for { color: var(--green); }
+  .result-verdict.mot { color: var(--red); }
+
+  .result-subtext {
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 24px;
+  }
+
+  .result-surprise {
+    display: inline-block;
+    background: var(--parchment);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 8px 16px;
+    font-size: 12px;
+    color: var(--muted);
+    font-style: italic;
+  }
+
+  /* STATS */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 8px;
+    padding: 16px 0 0;
+  }
+
+  .stat-item {
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    background: white;
+  }
+  .stat-label {
+    font-size: 8px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--border);
+    margin-bottom: 4px;
+  }
+  .stat-value {
+    font-size: 13px;
+    color: var(--muted);
+    font-family: 'Space Mono', monospace;
+  }
+
+  .rounds-detail {
+    margin-top: 8px;
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    background: white;
+  }
+  .rounds-label {
+    font-size: 8px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--border);
+    margin-bottom: 6px;
+  }
+  .rounds-chips {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .round-chip {
+    font-size: 10px;
+    padding: 3px 8px;
+    border-radius: 2px;
+    font-family: 'Space Mono', monospace;
+  }
+  .round-chip.for { background: rgba(39,174,96,0.12); color: var(--green); }
+  .round-chip.mot { background: rgba(192,57,43,0.12); color: var(--red); }
+
+  .restart-btn {
+    width: 100%;
+    padding: 13px;
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all 0.2s;
+    margin-top: 12px;
+  }
+  .restart-btn:hover { border-color: var(--ink); color: var(--ink); }
+
+  /* Empty state */
+  .empty-hint {
+    text-align: center;
+    padding: 20px;
+    font-size: 11px;
+    color: var(--border);
+    letter-spacing: 1px;
+    font-style: italic;
+  }
+
+  /* Divider ornament */
+  .ornament {
+    text-align: center;
+    color: var(--gold);
+    font-size: 14px;
+    letter-spacing: 8px;
+    margin: 24px 0;
+  }
+
+  /* No voters warning */
+  .warning {
+    font-size: 11px;
+    color: var(--red);
+    text-align: center;
+    padding: 8px;
+    display: none;
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header>
+    <p class="eyebrow">Est. Anno Domini MMXXVI</p>
+    <h1>Decision<br>Maker</h1>
+    <p class="subtitle">— Det Ultimate Demokrati —</p>
+  </header>
+
+  <!-- VOTERS -->
+  <div class="voters-section">
+    <p class="section-label">§1 — Stemmeberettigede</p>
+    <div class="voters-grid" id="voters-grid">
+      <div class="empty-hint">Ingen stemmeberettigede ennå. Legg til deltakere nedenfor.</div>
+    </div>
+    <button class="add-btn" onclick="addVoter()">+ Legg til person</button>
+    <p class="warning" id="no-voters-warning">Du må ha minst én stemmeberettiget.</p>
+  </div>
+
+  <div class="ornament">· · ·</div>
+
+  <!-- IMPORTANCE -->
+  <div class="importance-section">
+    <p class="section-label">§2 — Sakens Viktighet</p>
+    <div class="slider-wrap">
+      <div class="slider-labels">
+        <span>Bagatell</span>
+        <span>Riksrett</span>
+      </div>
+      <input type="range" id="importance-slider" min="1" max="5" value="1" oninput="updateImportance()">
+    </div>
+    <div class="importance-display">
+      <span class="importance-number" id="importance-number">1</span>
+      <div>
+        <div class="importance-text" id="importance-label">Trekning</div>
+        <div class="importance-text" style="color: var(--border); font-size:9px" id="importance-desc">Enkelt flertall</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ornament">· · ·</div>
+
+  <!-- VOTE BUTTON -->
+  <div class="vote-section">
+    <p class="section-label">§3 — Avgjørelsen</p>
+    <button class="vote-btn" id="vote-btn" onclick="startVoting()">
+      La demokratiet tale
+    </button>
+  </div>
+
+  <!-- COUNTING AREA -->
+  <div id="counting-area">
+    <p class="counting-title" id="counting-title">Konsulterer folkets vilje…</p>
+    <div class="drum-rolls" id="drum-rolls"></div>
+    <div class="random-ticker" id="random-ticker">—</div>
+    <div class="ticker-label">Tilfeldighetens tall</div>
+  </div>
+
+  <!-- RESULT -->
+  <div id="result-area">
+    <div class="result-card">
+      <div class="result-header">
+        <span class="result-header-text">Demokratiets Dom</span>
+      </div>
+      <div class="result-body">
+        <div class="result-verdict" id="result-verdict">FOR</div>
+        <div class="result-subtext" id="result-subtext">Flertallet seiret</div>
+        <div class="result-surprise" id="result-surprise"></div>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-grid" id="stats-grid"></div>
+    <div class="rounds-detail" id="rounds-detail" style="display:none">
+      <div class="rounds-label">Runde for runde</div>
+      <div class="rounds-chips" id="rounds-chips"></div>
+    </div>
+
+    <button class="restart-btn" onclick="restart()">↺ Ny Votering</button>
+  </div>
+
+</div>
+
+<script>
+  let voterCount = 0;
+
+  const importanceLabels = ['', 'Trekning', 'Trekninger', 'Trekninger', 'Trekninger', 'Trekninger'];
+  const importanceDescs = ['', 'Enkelt flertall', 'Dobbelt kontroll', 'Trippel sikring', 'Quad-vurdering', 'Grunnlovsendring'];
+
+  function updateImportance() {
+    const v = document.getElementById('importance-slider').value;
+    document.getElementById('importance-number').textContent = v;
+    document.getElementById('importance-label').textContent = v == 1 ? 'Trekning' : 'Trekninger';
+    document.getElementById('importance-desc').textContent = importanceDescs[v];
+  }
+
+  function addVoter() {
+    voterCount++;
+    const grid = document.getElementById('voters-grid');
+
+    // Remove empty hint
+    const hint = grid.querySelector('.empty-hint');
+    if (hint) hint.remove();
+
+    const row = document.createElement('div');
+    row.className = 'voter-row for';
+    row.dataset.id = voterCount;
+
+    row.innerHTML = `
+      <span class="voter-name">Person ${voterCount}</span>
+      <div class="toggle-wrap">
+        <span class="toggle-label mot-label">Mot</span>
+        <label class="toggle">
+          <input type="checkbox" checked onchange="updateVoterState(${voterCount}, this)">
+          <span class="toggle-track"></span>
+          <span class="toggle-thumb"></span>
+        </label>
+        <span class="toggle-label for-label">For</span>
+      </div>
+      <button class="remove-btn" onclick="removeVoter(${voterCount})" title="Fjern">✕</button>
+    `;
+
+    grid.appendChild(row);
+  }
+
+  function updateVoterState(id, checkbox) {
+    const row = document.querySelector(`[data-id="${id}"]`);
+    if (row) {
+      row.className = 'voter-row ' + (checkbox.checked ? 'for' : 'mot');
+    }
+  }
+
+  function removeVoter(id) {
+    const row = document.querySelector(`[data-id="${id}"]`);
+    if (row) {
+      row.style.animation = 'none';
+      row.style.opacity = '0';
+      row.style.transform = 'translateX(20px)';
+      row.style.transition = 'all 0.2s ease';
+      setTimeout(() => {
+        row.remove();
+        const grid = document.getElementById('voters-grid');
+        if (grid.children.length === 0) {
+          grid.innerHTML = '<div class="empty-hint">Ingen stemmeberettigede ennå. Legg til deltakere nedenfor.</div>';
+        }
+      }, 200);
+    }
+  }
+
+  function getVotes() {
+    const rows = document.querySelectorAll('.voter-row');
+    let forCount = 0, motCount = 0;
+    rows.forEach(row => {
+      const cb = row.querySelector('input[type=checkbox]');
+      if (cb.checked) forCount++;
+      else motCount++;
+    });
+    return { forCount, motCount, total: forCount + motCount };
+  }
+
+  function singleDraw(forPct) {
+    const rand = Math.random() * 100;
+    if (rand < forPct) return { result: 'for', rand: rand.toFixed(1) };
+    else return { result: 'mot', rand: rand.toFixed(1) };
+  }
+
+  async function startVoting() {
+    const rows = document.querySelectorAll('.voter-row');
+    if (rows.length === 0) {
+      document.getElementById('no-voters-warning').style.display = 'block';
+      return;
+    }
+    document.getElementById('no-voters-warning').style.display = 'none';
+
+    const { forCount, motCount, total } = getVotes();
+    const forPct = (forCount / total) * 100;
+    const importance = parseInt(document.getElementById('importance-slider').value);
+
+    // Hide result, show counting
+    document.getElementById('result-area').style.display = 'none';
+    document.getElementById('vote-btn').disabled = true;
+
+    const countingArea = document.getElementById('counting-area');
+    countingArea.style.display = 'block';
+
+    // Build drum indicators
+    const drumContainer = document.getElementById('drum-rolls');
+    drumContainer.innerHTML = '';
+    for (let i = 1; i <= importance; i++) {
+      const d = document.createElement('div');
+      d.className = 'drum';
+      d.id = `drum-${i}`;
+      d.textContent = i;
+      drumContainer.appendChild(d);
+    }
+
+    const rounds = [];
+    const ticker = document.getElementById('random-ticker');
+    const countingTitle = document.getElementById('counting-title');
+
+    const delay = ms => new Promise(r => setTimeout(r, ms));
+    const totalTime = 5000;
+    const timePerRound = totalTime / importance;
+
+    for (let i = 1; i <= importance; i++) {
+      const drum = document.getElementById(`drum-${i}`);
+      drum.classList.add('active');
+      countingTitle.textContent = `Runde ${i} av ${importance} — konsulterer urnene…`;
+
+      // Animate random number ticker
+      const tickDuration = timePerRound - 300;
+      const tickInterval = 60;
+      let elapsed = 0;
+      let finalRand;
+
+      await new Promise(resolve => {
+        const interval = setInterval(() => {
+          const n = (Math.random() * 100).toFixed(1);
+          ticker.textContent = n;
+          elapsed += tickInterval;
+          if (elapsed >= tickDuration) {
+            clearInterval(interval);
+            const draw = singleDraw(forPct);
+            finalRand = parseFloat(draw.rand);
+            ticker.textContent = draw.rand;
+            rounds.push({ rand: finalRand, result: draw.result });
+            resolve();
+          }
+        }, tickInterval);
+      });
+
+      drum.classList.remove('active');
+      drum.classList.add('done');
+      drum.textContent = finalRand.toFixed(0);
+      drum.style.borderColor = rounds[i-1].result === 'for' ? 'var(--green)' : 'var(--red)';
+      drum.style.color = rounds[i-1].result === 'for' ? 'var(--green)' : 'var(--red)';
+
+      await delay(300);
+    }
+
+    // Tally
+    let forWins = rounds.filter(r => r.result === 'for').length;
+    let motWins = rounds.filter(r => r.result === 'mot').length;
+
+    // Sudden death if tied
+    if (forWins === motWins) {
+      countingArea.style.display = 'block';
+      countingTitle.textContent = 'Uavgjort — Sudden Death!';
+      drumContainer.innerHTML = '';
+      const sd = document.createElement('div');
+      sd.className = 'drum active';
+      sd.id = 'drum-sd';
+      sd.textContent = '⚡';
+      drumContainer.appendChild(sd);
+
+      const sdDraw = await new Promise(resolve => {
+        let sdElapsed = 0;
+        const sdInterval = setInterval(() => {
+          const n = (Math.random() * 100).toFixed(1);
+          ticker.textContent = n;
+          sdElapsed += 60;
+          if (sdElapsed >= 4700) {
+            clearInterval(sdInterval);
+            const draw = singleDraw(forPct);
+            ticker.textContent = draw.rand;
+            rounds.push({ rand: parseFloat(draw.rand), result: draw.result, suddenDeath: true });
+            sd.classList.remove('active');
+            sd.classList.add('done');
+            sd.textContent = parseFloat(draw.rand).toFixed(0);
+            sd.style.borderColor = draw.result === 'for' ? 'var(--green)' : 'var(--red)';
+            sd.style.color = draw.result === 'for' ? 'var(--green)' : 'var(--red)';
+            resolve(draw);
+          }
+        }, 60);
+      });
+
+      await delay(400);
+      if (sdDraw.result === 'for') forWins++; else motWins++;
+    }
+
+    const finalResult = forWins > motWins ? 'for' : 'mot';
+
+    const democraticWinner = forCount >= motCount ? 'for' : 'mot';
+    const minority = forCount < motCount ? 'for' : 'mot';
+    const upset = finalResult !== democraticWinner;
+
+    await delay(400);
+    countingArea.style.display = 'none';
+
+    // Show result
+    const resultArea = document.getElementById('result-area');
+    resultArea.style.display = 'block';
+
+    const verdict = document.getElementById('result-verdict');
+    verdict.textContent = finalResult === 'for' ? 'FOR' : 'MOT';
+    verdict.className = 'result-verdict ' + finalResult;
+
+    const subtext = document.getElementById('result-subtext');
+    subtext.textContent = upset ? 'Mindretallet seiret' : 'Flertallet seiret';
+    document.getElementById('result-surprise').style.display = 'none';
+
+    // Stats
+    const statsGrid = document.getElementById('stats-grid');
+    statsGrid.innerHTML = `
+      <div class="stat-item">
+        <div class="stat-label">For / Mot</div>
+        <div class="stat-value">${forCount} / ${motCount}</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-label">Flertalls-prosent</div>
+        <div class="stat-value">${forPct.toFixed(1)}% / ${(100-forPct).toFixed(1)}%</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-label">Viktighetsnivå</div>
+        <div class="stat-value">${importance} runde${importance > 1 ? 'r' : ''}</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-label">For-seiere</div>
+        <div class="stat-value">${forWins} — ${motWins}</div>
+      </div>
+    `;
+
+    // Round detail
+    if (importance >= 1) {
+      const roundsDetail = document.getElementById('rounds-detail');
+      roundsDetail.style.display = 'block';
+      const chipsContainer = document.getElementById('rounds-chips');
+      chipsContainer.innerHTML = rounds.map((r, i) =>
+        `<span class="round-chip ${r.result}">${r.suddenDeath ? '⚡ SD' : 'R'+(i+1)}: ${r.rand.toFixed(1)} → ${r.result === 'for' ? 'For' : 'Mot'}</span>`
+      ).join('');
+    }
+
+    document.getElementById('vote-btn').disabled = false;
+  }
+
+  function restart() {
+    document.getElementById('result-area').style.display = 'none';
+    document.getElementById('counting-area').style.display = 'none';
+    document.getElementById('rounds-detail').style.display = 'none';
+  }
+
+  // Init
+  updateImportance();
+  addVoter();
+  addVoter();
+  addVoter();
+</script>
+</body>
+</html>

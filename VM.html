@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="nb">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hjorthehaven Open – Fotball-VM 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --pitch:#0A2E22;
+    --panel:#0E3B2C;
+    --panel-2:#114433;
+    --line:#1E5E41;
+    --chalk:#F4F7F2;
+    --chalk-dim:#A8C2B4;
+    --gold:#E8B33C;
+    --red:#D95C4A;
+    --green-ok:#5BBE7E;
+    --radius:14px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    background:var(--pitch);
+    color:var(--chalk);
+    font-family:'Inter',system-ui,sans-serif;
+    min-height:100vh;
+    font-size:15px;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1060px;margin:0 auto;padding:0 16px 64px}
+
+  /* ---------- header med kritt-midtsirkel ---------- */
+  header{
+    position:relative;
+    padding:42px 0 26px;
+    overflow:hidden;
+  }
+  header::before{
+    content:"";
+    position:absolute;
+    right:-90px; top:-140px;
+    width:340px;height:340px;
+    border:2px solid rgba(244,247,242,.14);
+    border-radius:50%;
+    pointer-events:none;
+  }
+  header::after{
+    content:"";
+    position:absolute;
+    right:74px; top:24px;
+    width:8px;height:8px;
+    background:rgba(244,247,242,.18);
+    border-radius:50%;
+  }
+  .eyebrow{
+    font-family:'Oswald',sans-serif;
+    text-transform:uppercase;
+    letter-spacing:.22em;
+    font-size:12px;
+    color:var(--gold);
+    margin-bottom:8px;
+  }
+  h1{
+    font-family:'Oswald',sans-serif;
+    font-weight:700;
+    text-transform:uppercase;
+    font-size:clamp(30px,5.4vw,52px);
+    line-height:1.02;
+    letter-spacing:.01em;
+  }
+  .statusline{
+    display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+    margin-top:16px;
+    font-size:13px;color:var(--chalk-dim);
+  }
+  .dot{
+    width:8px;height:8px;border-radius:50%;
+    background:var(--green-ok);
+    display:inline-block;margin-right:6px;
+    animation:pulse 2.4s ease-in-out infinite;
+  }
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+  @media (prefers-reduced-motion:reduce){ .dot{animation:none} }
+  button.refresh{
+    background:transparent;
+    border:1px solid var(--line);
+    color:var(--chalk);
+    font-family:'Oswald',sans-serif;
+    text-transform:uppercase;
+    letter-spacing:.1em;
+    font-size:12px;
+    padding:7px 14px;
+    border-radius:999px;
+    cursor:pointer;
+    transition:border-color .15s, background .15s;
+  }
+  button.refresh:hover{border-color:var(--gold);background:rgba(232,179,60,.08)}
+  button.refresh:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+
+  /* ---------- stats ---------- */
+  .stats{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+    gap:10px;
+    margin:8px 0 26px;
+  }
+  .stat{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:14px 16px;
+  }
+  .stat .label{
+    font-family:'Oswald',sans-serif;
+    text-transform:uppercase;
+    letter-spacing:.14em;
+    font-size:11px;
+    color:var(--chalk-dim);
+  }
+  .stat .value{
+    font-family:'Oswald',sans-serif;
+    font-size:28px;
+    font-weight:600;
+    margin-top:4px;
+    font-variant-numeric:tabular-nums;
+  }
+  .stat .value small{font-size:14px;color:var(--chalk-dim);font-weight:400}
+
+  /* ---------- seksjoner ---------- */
+  h2{
+    font-family:'Oswald',sans-serif;
+    text-transform:uppercase;
+    letter-spacing:.12em;
+    font-size:15px;
+    font-weight:600;
+    color:var(--chalk-dim);
+    margin:30px 0 12px;
+    display:flex;align-items:center;gap:10px;
+  }
+  h2::after{content:"";flex:1;height:1px;background:var(--line)}
+
+  /* ---------- leaderboard (signatur) ---------- */
+  .board{display:flex;flex-direction:column;gap:8px}
+  .row{
+    display:grid;
+    grid-template-columns:34px 1fr 64px;
+    align-items:center;
+    gap:14px;
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:12px 16px;
+  }
+  .row.leader{
+    border-color:var(--gold);
+    background:linear-gradient(90deg, rgba(232,179,60,.12), var(--panel) 55%);
+  }
+  .rank{
+    font-family:'Oswald',sans-serif;
+    font-weight:700;font-size:20px;
+    color:var(--chalk-dim);
+    text-align:center;
+    font-variant-numeric:tabular-nums;
+  }
+  .row.leader .rank{color:var(--gold)}
+  .who{min-width:0}
+  .who .name{
+    font-family:'Oswald',sans-serif;
+    font-weight:500;font-size:17px;
+    text-transform:uppercase;letter-spacing:.04em;
+    display:flex;align-items:center;gap:8px;
+  }
+  .swatch{width:10px;height:10px;border-radius:3px;flex:none}
+  .bar{
+    height:6px;border-radius:3px;
+    background:var(--panel-2);
+    margin-top:8px;overflow:hidden;
+  }
+  .bar > i{
+    display:block;height:100%;
+    border-radius:3px;
+    transition:width .6s cubic-bezier(.2,.8,.2,1);
+  }
+  .pts{
+    font-family:'Oswald',sans-serif;
+    font-weight:700;font-size:26px;
+    text-align:right;
+    font-variant-numeric:tabular-nums;
+  }
+  .pts small{display:block;font-size:10px;font-weight:400;color:var(--chalk-dim);letter-spacing:.12em;text-transform:uppercase}
+
+  /* ---------- graf ---------- */
+  .chartbox{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:18px 16px 8px;
+  }
+  .legend{display:flex;flex-wrap:wrap;gap:6px 16px;margin-bottom:10px;font-size:12px;color:var(--chalk-dim)}
+  .legend span{display:inline-flex;align-items:center;gap:6px}
+  svg text{font-family:'Inter',sans-serif}
+
+  /* ---------- spørsmålsliste ---------- */
+  .filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+  .chip{
+    background:transparent;border:1px solid var(--line);
+    color:var(--chalk-dim);
+    border-radius:999px;padding:6px 14px;
+    font-family:'Oswald',sans-serif;text-transform:uppercase;
+    letter-spacing:.08em;font-size:12px;cursor:pointer;
+    transition:all .15s;
+  }
+  .chip:hover{border-color:var(--chalk-dim)}
+  .chip.active{background:var(--chalk);color:var(--pitch);border-color:var(--chalk)}
+  .chip:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+
+  .qlist{display:flex;flex-direction:column;gap:8px}
+  .q{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:13px 16px;
+  }
+  .q.decided{border-left:3px solid var(--green-ok)}
+  .q.open{border-left:3px solid var(--line)}
+  .qtop{display:flex;justify-content:space-between;gap:14px;align-items:baseline}
+  .qtext{font-weight:600;font-size:14px;line-height:1.4}
+  .qmeta{
+    font-family:'Oswald',sans-serif;font-size:12px;
+    color:var(--chalk-dim);letter-spacing:.08em;text-transform:uppercase;
+    white-space:nowrap;
+  }
+  .fasit{
+    margin-top:6px;font-size:13px;color:var(--chalk-dim);
+  }
+  .fasit b{color:var(--gold);font-weight:600}
+  .answers{
+    display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;
+  }
+  .ans{
+    font-size:12px;
+    border-radius:8px;
+    padding:4px 9px;
+    background:var(--panel-2);
+    border:1px solid var(--line);
+    color:var(--chalk-dim);
+    display:inline-flex;align-items:center;gap:6px;
+  }
+  .ans b{color:var(--chalk);font-weight:600}
+  .ans.hit{border-color:rgba(91,190,126,.6);background:rgba(91,190,126,.12)}
+  .ans.hit b{color:var(--green-ok)}
+  .ans.miss{border-color:rgba(217,92,74,.45);background:rgba(217,92,74,.08)}
+  .ans.miss b{color:var(--red)}
+
+  /* ---------- feil/lasting ---------- */
+  .notice{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:22px;
+    color:var(--chalk-dim);
+    line-height:1.6;
+  }
+  .notice.error{border-color:var(--red)}
+  .notice b{color:var(--chalk)}
+
+  footer{
+    margin-top:46px;
+    font-size:12px;
+    color:var(--chalk-dim);
+    border-top:1px solid var(--line);
+    padding-top:16px;
+  }
+
+  @media (max-width:640px){
+    .row{grid-template-columns:26px 1fr 52px;padding:10px 12px;gap:10px}
+    .pts{font-size:21px}
+    .who .name{font-size:15px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="eyebrow">Tippekonkurranse · FIFA World Cup 2026</div>
+    <h1>Hjorthehaven Open</h1>
+    <div class="statusline">
+      <span><span class="dot" id="liveDot"></span><span id="lastUpdated">Henter data …</span></span>
+      <button class="refresh" id="refreshBtn">Oppdater nå</button>
+      <span id="autoInfo">Oppdateres automatisk hvert 2. minutt</span>
+    </div>
+  </header>
+
+  <div id="app">
+    <div class="notice" id="loading">Laster resultater fra Google Sheets …</div>
+  </div>
+
+  <footer>
+    Data hentes direkte fra det delte Google-arket. Endringer i arket vises her ved neste oppdatering.
+  </footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var SHEET_ID = "1Zzk2-ZXd-3lvgcvNwtP7fasudr000ITdDzNzyJ9eCp0";
+  var GVIZ_URL = "https://docs.google.com/spreadsheets/d/" + SHEET_ID + "/gviz/tq?tqx=out:json&headers=0";
+  var REFRESH_MS = 120000;
+
+  var PLAYER_COLORS = ["#E8B33C","#5BBE7E","#6FB7E0","#D95C4A","#C68FE0","#E0A06F","#8FD6C9","#E0D26F"];
+
+  var state = { filter:"all", data:null };
+
+  /* ---------------- datainnhenting ---------------- */
+
+  function fetchSheet(){
+    return fetch(GVIZ_URL, {cache:"no-store"})
+      .then(function(r){
+        if(!r.ok) throw new Error("HTTP " + r.status);
+        return r.text();
+      })
+      .then(function(txt){
+        var start = txt.indexOf("{");
+        var end = txt.lastIndexOf("}");
+        if(start < 0 || end < 0) throw new Error("Uventet svar fra Google Sheets");
+        return JSON.parse(txt.slice(start, end + 1));
+      });
+  }
+
+  function cellVal(row, i){
+    if(!row || !row.c || !row.c[i]) return null;
+    var c = row.c[i];
+    if(c.v === null || c.v === undefined) return null;
+    return c.v;
+  }
+  function cellStr(row, i){
+    var v = cellVal(row, i);
+    if(v === null) return "";
+    return String(v).trim();
+  }
+  function cellNum(row, i){
+    var v = cellVal(row, i);
+    if(typeof v === "number") return v;
+    if(typeof v === "string"){
+      var n = parseFloat(v.replace(",", "."));
+      if(!isNaN(n) && v.trim() !== "" && v.trim() !== "-") return n;
+    }
+    return null;
+  }
+
+  function parseSheet(json){
+    var rows = (json.table && json.table.rows) || [];
+
+    // finn header-raden (cellen som heter "Spørsmål")
+    var headerIdx = -1, qCol = -1;
+    for(var r = 0; r < rows.length && headerIdx < 0; r++){
+      var cells = rows[r].c || [];
+      for(var c = 0; c < cells.length; c++){
+        if(cells[c] && typeof cells[c].v === "string" && cells[c].v.trim() === "Spørsmål"){
+          headerIdx = r; qCol = c; break;
+        }
+      }
+    }
+    if(headerIdx < 0) throw new Error("Fant ikke header-raden («Spørsmål») i arket.");
+
+    var hdr = rows[headerIdx];
+    var fasitCol = -1;
+    for(var i = qCol + 1; i < (hdr.c||[]).length; i++){
+      if(cellStr(hdr, i) === "Fasit"){ fasitCol = i; break; }
+    }
+    if(fasitCol < 0) throw new Error("Fant ikke «Fasit»-kolonnen.");
+    var maxPtsCol = fasitCol + 1;
+
+    // spillere: par av (navn, poengkolonne) etter fasit + maks-poeng
+    var players = [];
+    var i2 = maxPtsCol + 1;
+    while(true){
+      var name = cellStr(hdr, i2);
+      if(!name) break;
+      // navnecellen skal være tekst, poengcellen kan være tall/tom
+      if(/^\d+([.,]\d+)?$/.test(name)) break; // traff en datokolonne e.l.
+      players.push({ name:name, aCol:i2, pCol:i2+1, color:PLAYER_COLORS[players.length % PLAYER_COLORS.length] });
+      i2 += 2;
+    }
+    if(!players.length) throw new Error("Fant ingen deltakere i header-raden.");
+    var dateCol = players[players.length-1].pCol + 1;
+
+    // spørsmålsrader
+    var entries = [];
+    var lastText = "", contCount = 1;
+    for(var r2 = headerIdx + 1; r2 < rows.length; r2++){
+      var row = rows[r2];
+      var maxPts = cellNum(row, maxPtsCol);
+      var qText = cellStr(row, qCol);
+      if(maxPts === null && !qText) continue;        // tomrad
+      if(maxPts === null) maxPts = 0;
+
+      if(qText){ lastText = qText; contCount = 1; }
+      else { contCount++; qText = lastText + " (" + contCount + ")"; }
+
+      var fasitRaw = cellVal(row, fasitCol);
+      var fasit = (fasitRaw === null) ? "" : String(fasitRaw).trim();
+      var decided = fasit !== "";
+
+      var answers = players.map(function(p){
+        return {
+          answer: cellStr(row, p.aCol),
+          points: cellNum(row, p.pCol)
+        };
+      });
+
+      entries.push({
+        text: qText,
+        fasit: fasit,
+        maxPts: maxPts,
+        decided: decided,
+        dateLabel: cellStr(row, dateCol),
+        answers: answers
+      });
+    }
+
+    // totaler + kumulativ utvikling
+    players.forEach(function(p){ p.total = 0; p.cum = [0]; });
+    var decidedEntries = entries.filter(function(e){ return e.decided; });
+    decidedEntries.forEach(function(e){
+      players.forEach(function(p, pi){
+        var pts = e.answers[pi].points;
+        p.total += (pts || 0);
+        p.cum.push(p.total);
+      });
+    });
+
+    var potRemaining = entries.filter(function(e){ return !e.decided; })
+                              .reduce(function(s,e){ return s + e.maxPts; }, 0);
+
+    return { players:players, entries:entries, decidedCount:decidedEntries.length, potRemaining:potRemaining };
+  }
+
+  /* ---------------- rendering ---------------- */
+
+  function esc(s){
+    return String(s).replace(/[&<>"']/g, function(ch){
+      return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[ch];
+    });
+  }
+
+  function render(){
+    var d = state.data;
+    var app = document.getElementById("app");
+    if(!d){ return; }
+
+    var sorted = d.players.slice().sort(function(a,b){ return b.total - a.total; });
+    var maxTotal = Math.max(1, sorted[0].total);
+    var leaderPts = sorted[0].total;
+    var margin = sorted.length > 1 ? leaderPts - sorted[1].total : 0;
+    var leaders = sorted.filter(function(p){ return p.total === leaderPts; });
+
+    var html = "";
+
+    // statkort
+    html += '<div class="stats">';
+    html += statCard("Leder", leaders.map(function(p){return esc(p.name);}).join(" & "),
+                     leaders.length > 1 ? "delt ledelse" : "+" + margin + " poeng");
+    html += statCard("Avgjorte spørsmål", d.decidedCount + ' <small>av ' + d.entries.length + "</small>", "");
+    html += statCard("Poeng igjen i potten", d.potRemaining, "");
+    html += '</div>';
+
+    // leaderboard
+    html += '<h2>Stillingen</h2><div class="board">';
+    var prevPts = null, shownRank = 0;
+    sorted.forEach(function(p, idx){
+      if(p.total !== prevPts){ shownRank = idx + 1; prevPts = p.total; }
+      var pct = Math.round(100 * p.total / maxTotal);
+      var isLeader = p.total === leaderPts;
+      html += '<div class="row' + (isLeader ? ' leader' : '') + '">' +
+        '<div class="rank">' + shownRank + '</div>' +
+        '<div class="who"><div class="name"><span class="swatch" style="background:' + p.color + '"></span>' + esc(p.name) + '</div>' +
+        '<div class="bar"><i style="width:' + pct + '%;background:' + p.color + '"></i></div></div>' +
+        '<div class="pts">' + p.total + '<small>poeng</small></div>' +
+        '</div>';
+    });
+    html += '</div>';
+
+    // utviklingsgraf
+    if(d.decidedCount >= 2){
+      html += '<h2>Poengutvikling</h2><div class="chartbox">';
+      html += '<div class="legend">' + d.players.map(function(p){
+        return '<span><span class="swatch" style="background:' + p.color + '"></span>' + esc(p.name) + '</span>';
+      }).join("") + '</div>';
+      html += buildChart(d.players);
+      html += '</div>';
+    }
+
+    // spørsmål
+    var counts = {
+      all: d.entries.length,
+      decided: d.decidedCount,
+      open: d.entries.length - d.decidedCount
+    };
+    html += '<h2>Spørsmål</h2>';
+    html += '<div class="filters">' +
+      chipBtn("all", "Alle (" + counts.all + ")") +
+      chipBtn("decided", "Avgjort (" + counts.decided + ")") +
+      chipBtn("open", "Ikke avgjort (" + counts.open + ")") +
+      '</div><div class="qlist">';
+
+    d.entries.forEach(function(e){
+      if(state.filter === "decided" && !e.decided) return;
+      if(state.filter === "open" && e.decided) return;
+
+      html += '<div class="q ' + (e.decided ? 'decided' : 'open') + '">';
+      html += '<div class="qtop"><div class="qtext">' + esc(e.text) + '</div>' +
+              '<div class="qmeta">' + e.maxPts + ' p' +
+              (e.dateLabel && !e.decided ? ' · ' + esc(e.dateLabel) : '') + '</div></div>';
+      if(e.decided){
+        html += '<div class="fasit">Fasit: <b>' + esc(e.fasit) + '</b></div>';
+      }
+      html += '<div class="answers">';
+      e.answers.forEach(function(a, pi){
+        var cls = "ans";
+        if(e.decided){
+          cls += (a.points && a.points > 0) ? " hit" : " miss";
+        }
+        html += '<span class="' + cls + '"><b>' + esc(d.players[pi].name) + '</b> ' +
+                esc(a.answer || "–") +
+                (e.decided && a.points ? ' · +' + a.points : '') +
+                '</span>';
+      });
+      html += '</div></div>';
+    });
+    html += '</div>';
+
+    app.innerHTML = html;
+
+    // filter-knapper
+    Array.prototype.forEach.call(app.querySelectorAll(".chip"), function(btn){
+      btn.addEventListener("click", function(){
+        state.filter = btn.getAttribute("data-f");
+        render();
+      });
+    });
+  }
+
+  function statCard(label, value, sub){
+    return '<div class="stat"><div class="label">' + label + '</div>' +
+           '<div class="value">' + value + (sub ? ' <small>' + esc(sub) + '</small>' : '') + '</div></div>';
+  }
+  function chipBtn(key, label){
+    return '<button class="chip' + (state.filter === key ? ' active' : '') + '" data-f="' + key + '">' + label + '</button>';
+  }
+
+  function buildChart(players){
+    var W = 980, H = 240, padL = 34, padR = 12, padT = 12, padB = 26;
+    var steps = players[0].cum.length;            // inkl. startpunkt 0
+    var maxY = Math.max(5, Math.max.apply(null, players.map(function(p){ return p.total; })));
+    var x = function(i){ return padL + (W - padL - padR) * (steps <= 1 ? 0 : i / (steps - 1)); };
+    var y = function(v){ return H - padB - (H - padT - padB) * (v / maxY); };
+
+    var svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" width="100%" height="auto" role="img" aria-label="Kumulativ poengutvikling">';
+    // gridlinjer
+    var ticks = 4;
+    for(var t = 0; t <= ticks; t++){
+      var v = Math.round(maxY * t / ticks);
+      var yy = y(v);
+      svg += '<line x1="' + padL + '" y1="' + yy + '" x2="' + (W - padR) + '" y2="' + yy + '" stroke="#1E5E41" stroke-width="1"/>';
+      svg += '<text x="' + (padL - 8) + '" y="' + (yy + 4) + '" text-anchor="end" font-size="11" fill="#A8C2B4">' + v + '</text>';
+    }
+    svg += '<text x="' + padL + '" y="' + (H - 6) + '" font-size="11" fill="#A8C2B4">Start</text>';
+    svg += '<text x="' + (W - padR) + '" y="' + (H - 6) + '" text-anchor="end" font-size="11" fill="#A8C2B4">Spørsmål ' + (steps - 1) + '</text>';
+
+    players.forEach(function(p){
+      var pts = p.cum.map(function(v, i){ return x(i) + "," + y(v); }).join(" ");
+      svg += '<polyline points="' + pts + '" fill="none" stroke="' + p.color + '" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" opacity="0.9"/>';
+      var lastX = x(steps - 1), lastY = y(p.total);
+      svg += '<circle cx="' + lastX + '" cy="' + lastY + '" r="4" fill="' + p.color + '"/>';
+    });
+    svg += '</svg>';
+    return svg;
+  }
+
+  /* ---------------- livssyklus ---------------- */
+
+  function setUpdated(ok){
+    var el = document.getElementById("lastUpdated");
+    var dot = document.getElementById("liveDot");
+    var now = new Date();
+    var hh = String(now.getHours()).padStart(2,"0");
+    var mm = String(now.getMinutes()).padStart(2,"0");
+    var ss = String(now.getSeconds()).padStart(2,"0");
+    if(ok){
+      el.textContent = "Sist oppdatert " + hh + ":" + mm + ":" + ss;
+      dot.style.background = "var(--green-ok)";
+    } else {
+      el.textContent = "Klarte ikke å oppdatere (" + hh + ":" + mm + ":" + ss + ")";
+      dot.style.background = "var(--red)";
+    }
+  }
+
+  function load(){
+    fetchSheet()
+      .then(function(json){
+        state.data = parseSheet(json);
+        setUpdated(true);
+        render();
+      })
+      .catch(function(err){
+        setUpdated(false);
+        if(!state.data){
+          document.getElementById("app").innerHTML =
+            '<div class="notice error"><b>Fikk ikke hentet data fra Google Sheets.</b><br><br>' +
+            'Mulige årsaker:<br>' +
+            '• Arket må være delt som «Alle med lenken kan se»<br>' +
+            '• Filen må åpnes i en vanlig nettleser (forhåndsvisninger i sandkasse kan blokkere eksterne kall)<br>' +
+            '• Nettverksfeil – prøv «Oppdater nå»<br><br>' +
+            '<span style="font-size:12px;opacity:.7">Teknisk: ' + esc(err.message) + '</span></div>';
+        }
+        console.error(err);
+      });
+  }
+
+  document.getElementById("refreshBtn").addEventListener("click", load);
+  document.addEventListener("visibilitychange", function(){
+    if(!document.hidden) load();
+  });
+  setInterval(load, REFRESH_MS);
+  load();
+})();
+</script>
+</body>
+</html>

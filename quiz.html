@@ -4,296 +4,482 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Lagkode – Sommerquiz</title>
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
   <style>
-    body {
-      font-family: Arial, sans-serif;
+    * {
+      box-sizing: border-box;
       margin: 0;
       padding: 0;
-      background: #e0f7fa;
-      color: #004d40;
+    }
+
+    body {
+      font-family: 'Nunito', Arial, sans-serif;
+      min-height: 100vh;
+      background: linear-gradient(160deg, #87CEEB 0%, #FFF176 55%, #FFB74D 100%);
+      color: #3e2723;
+      overflow-x: hidden;
+    }
+
+    .sun {
+      position: fixed;
+      top: -60px;
+      right: -60px;
+      width: 200px;
+      height: 200px;
+      background: radial-gradient(circle, #FFE082 40%, #FFB300 70%, transparent 100%);
+      border-radius: 50%;
+      animation: pulse-sun 4s ease-in-out infinite;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    @keyframes pulse-sun {
+      0%, 100% { transform: scale(1); opacity: 0.85; }
+      50% { transform: scale(1.08); opacity: 1; }
+    }
+
+    .wave-wrapper {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .wave-wrapper svg {
+      display: block;
+      width: 100%;
     }
 
     .container {
-      padding: 20px;
-      max-width: 600px;
+      position: relative;
+      z-index: 1;
+      padding: 40px 20px 120px;
+      max-width: 620px;
       margin: auto;
     }
 
+    .card {
+      background: rgba(255, 255, 255, 0.75);
+      backdrop-filter: blur(8px);
+      border-radius: 24px;
+      padding: 36px 32px;
+      box-shadow: 0 8px 40px rgba(0, 0, 0, 0.12);
+    }
+
+    h1 {
+      font-family: 'Pacifico', cursive;
+      text-align: center;
+      font-size: 2em;
+      color: #E65100;
+      text-shadow: 2px 2px 0 #FFE082;
+      margin-bottom: 16px;
+      line-height: 1.2;
+    }
+
+    .divider {
+      border: none;
+      height: 3px;
+      background: linear-gradient(to right, #FFB300, #FF7043, #FFB300);
+      border-radius: 2px;
+      margin: 0 0 24px;
+    }
+
     .back-button {
-      display: inline-block;
-      margin: 15px 0 25px;
-      padding: 10px 15px;
-      background-color: #00796b;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 24px;
+      padding: 10px 16px;
+      background: linear-gradient(135deg, #29B6F6, #0288D1);
       color: white;
       text-decoration: none;
-      border-radius: 6px;
-      font-weight: bold;
-      transition: background-color 0.3s;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 0.9em;
+      box-shadow: 0 4px 12px rgba(2, 136, 209, 0.3);
+      transition: transform 0.15s, box-shadow 0.15s;
     }
 
     .back-button:hover {
-      background-color: #004d40;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(2, 136, 209, 0.45);
     }
 
-    h3 {
-      text-align: center;
-      color: #00796b;
+    .description {
+      font-size: 0.95em;
+      line-height: 1.65;
+      color: #4e342e;
+      margin-bottom: 28px;
     }
 
-    .content {
+    .description p + p {
+      margin-top: 8px;
+    }
+
+    .section-label {
+      font-size: 0.75em;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: #FF7043;
+      margin: 20px 0 8px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      font-weight: 700;
+      font-size: 0.95em;
+      color: #4e342e;
+      margin-bottom: 4px;
+    }
+
+    .form-group select {
+      width: 100%;
+      padding: 12px 14px;
+      border: 2px solid #FFB74D;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.85);
+      font-family: 'Nunito', Arial, sans-serif;
+      font-size: 1em;
+      color: #3e2723;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='8'%3E%3Cpath d='M0 0l7 8 7-8z' fill='%23FF7043'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+      cursor: pointer;
+      transition: border-color 0.2s;
+    }
+
+    .form-group select:focus {
+      outline: none;
+      border-color: #FF7043;
+    }
+
+    .check-button {
+      display: block;
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, #FF7043, #FF5722);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-family: 'Nunito', Arial, sans-serif;
+      font-size: 1.05em;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(255, 87, 34, 0.35);
+      transition: transform 0.15s, box-shadow 0.15s;
+      margin-top: 4px;
+    }
+
+    .check-button:hover {
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 8px 20px rgba(255, 87, 34, 0.45);
+    }
+
+    .result-box {
       margin-top: 20px;
+      padding: 16px 18px;
+      border-radius: 12px;
+      font-size: 0.95em;
+      line-height: 1.6;
     }
-	#question { font-weight: bold; }
+
+    #message:not(:empty) {
+      background: rgba(255, 183, 77, 0.3);
+      border: 2px solid #FFB74D;
+      color: #5d4037;
+    }
+
+    #question:not(:empty) {
+      background: rgba(102, 187, 106, 0.25);
+      border: 2px solid #66BB6A;
+      color: #1b5e20;
+      font-weight: 700;
+      font-size: 1.1em;
+      text-align: center;
+    }
+
+    #nextCoords:not(:empty) {
+      background: rgba(41, 182, 246, 0.2);
+      border: 2px solid #29B6F6;
+      color: #01579b;
+      font-style: italic;
+    }
+
+    #nextCoords a {
+      color: #0288D1;
+      font-weight: 700;
+    }
   </style>
 </head>
 <body>
+
+  <div class="sun"></div>
+
   <div class="container">
-    <a class="back-button" href="https://andersnyhus.github.io/anypage/">← Tilbake til startside</a>
+    <div class="card">
+      <a class="back-button" href="https://andersnyhus.github.io/anypage/">← Tilbake til startside</a>
 
-    <h3>Finn kode til post</h3>
+      <h1>Finn kode til post 🔐</h1>
+      <hr class="divider">
 
-    <div class="content">
-      <!-- Her er innholdet ditt fra før. Du kan lime inn scriptet/innholdet ditt her -->
-    
-	  <p>Denne siden gir deg kode for å åpne posten basert på posisjonen din. Sørg for at du har aktivert posisjonstjenester på telefonen!</p>
-	  <p>All lag har unike lokasjoner, velg ditt lag og posten du skal til. Om dere er på rett sted vises koden under, samt koordinater til neste post. Benytt koden for å låse opp sprørreskjemaet.</p>
-	  <p>Har der glemt hvor dere skulle, fortvil ikke. Velg forrige post, og lokasjon vil vises under "Neste post".</p>
+      <div class="description">
+        <p>Denne siden gir deg kode for å åpne posten basert på posisjonen din. Sørg for at du har aktivert posisjonstjenester på telefonen!</p>
+        <p>Velg lag og post, og trykk «Sjekk posisjon». Om dere er på rett sted vises koden, samt koordinater til neste post.</p>
+        <p>Har dere glemt hvor dere skulle? Velg forrige post — lokasjonen vises under «Neste post».</p>
+      </div>
 
- 
-  <label for="team">Velg lag:</label>
-  <select id="team">
-    <option value="">-- Velg lag --</option>
-    <option value="Lag 1">Lag 1</option>
-    <option value="Lag 2">Lag 2</option>
-    <option value="Lag 3">Lag 3</option>
-    <option value="Lag 4">Lag 4</option>
-    <option value="Lag 5">Lag 5</option>
-    <option value="Lag 6">Lag 6</option>
-    <option value="Lag 7">Lag 7</option>
-    <option value="Lag 8">Lag 8</option>
-    <option value="Lag 9">Lag 9</option>
-    <option value="Lag 10">Lag 10</option>
-    <option value="Lag 11">Lag 11</option>
-    <option value="Lag 12">Lag 12</option>
-  </select><br><br>
+      <div class="section-label">Velg lag og post</div>
+      <div class="form-group">
+        <div>
+          <label for="team">Lag</label>
+          <select id="team">
+            <option value="">-- Velg lag --</option>
+            <option value="Lag 1">Lag 1</option>
+            <option value="Lag 2">Lag 2</option>
+            <option value="Lag 3">Lag 3</option>
+            <option value="Lag 4">Lag 4</option>
+            <option value="Lag 5">Lag 5</option>
+            <option value="Lag 6">Lag 6</option>
+            <option value="Lag 7">Lag 7</option>
+            <option value="Lag 8">Lag 8</option>
+            <option value="Lag 9">Lag 9</option>
+            <option value="Lag 10">Lag 10</option>
+            <option value="Lag 11">Lag 11</option>
+            <option value="Lag 12">Lag 12</option>
+          </select>
+        </div>
+        <div>
+          <label for="post">Post</label>
+          <select id="post">
+            <option value="">-- Velg post --</option>
+            <option value="Post 1">Post 1</option>
+            <option value="Post 2">Post 2</option>
+            <option value="Post 3">Post 3</option>
+            <option value="Post 4">Post 4</option>
+            <option value="Post 5">Post 5</option>
+          </select>
+        </div>
+      </div>
 
-  <label for="post">Velg post:</label>
-  <select id="post">
-    <option value="">-- Velg post --</option>
-    <option value="Post 1">Post 1</option>
-    <option value="Post 2">Post 2</option>
-    <option value="Post 3">Post 3</option>
-    <option value="Post 4">Post 4</option>
-    <option value="Post 5">Post 5</option>
-  </select> <br><br>
+      <button class="check-button" onclick="checkPosition()">📍 Sjekk posisjon</button>
 
-  <a class="back-button" onclick="checkPosition()">Sjekk posisjon</a>
-
-
-  <div id="message" style="margin-top: 2em;"></div>
-  <div id="question" style="margin-top: 2em;"></div>
-  <div id="nextCoords" style="margin-top: 2em; font-style: italic;"></div>
-          
+      <div id="message" class="result-box"></div>
+      <div id="question" class="result-box"></div>
+      <div id="nextCoords" class="result-box"></div>
     </div>
   </div>
-  
-  
+
+  <div class="wave-wrapper">
+    <svg viewBox="0 0 1440 120" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+      <path d="M0,60 C240,110 480,10 720,60 C960,110 1200,10 1440,60 L1440,120 L0,120 Z" fill="rgba(2,136,209,0.35)"/>
+      <path d="M0,80 C300,30 600,110 900,70 C1100,45 1300,90 1440,75 L1440,120 L0,120 Z" fill="rgba(2,136,209,0.55)"/>
+    </svg>
+  </div>
+
   <script>
-  // Struktur: postCoordinates[lag][post] = {lat, lon} - Trenger 5 gjeldene siffer for 1m nøyaktighet - 4 siffer gir 10m
-	const postCoordinates = {
-		"Lag 1": {
-		"Post 1": { lat: 59.91121, lon: 10.64012 },
-		"Post 2": { lat: 59.90734, lon: 10.64204 },
-		"Post 3": { lat: 59.90945, lon: 10.64283 },
-		"Post 4": { lat: 59.91335, lon: 10.6398 },
-		"Post 5": { lat: 59.91451, lon: 10.6351 }
-		},
-		"Lag 2": {
-		"Post 1": { lat: 59.91121, lon: 10.64012 },  // Mitt kontor
-		"Post 2": { lat: 59.90766, lon: 10.64204 },
-		"Post 3": { lat: 59.91018, lon: 10.64215 },
-		"Post 4": { lat: 59.91328, lon: 10.63892 },
-		"Post 5": { lat: 59.9148, lon: 10.63539 }
-		},
-		"Lag 3": {
-		"Post 1": { lat: 59.91121, lon: 10.64012 },  // Hjemme
-		"Post 2": { lat: 59.90833, lon: 10.64042 },
-		"Post 3": { lat: 59.911, lon: 10.64145 },
-		"Post 4": { lat: 59.91391, lon: 10.63467 },
-		"Post 5": { lat: 59.91507, lon: 10.636 }
-		},
-		"Lag 4": {
-		"Post 1": { lat: 59.91121, lon: 10.64012 },
-		"Post 2": { lat: 59.90947, lon: 10.64286 },
-		"Post 3": { lat: 59.91173, lon: 10.64137 },
-		"Post 4": { lat: 59.91459, lon: 10.6336 },
-		"Post 5": { lat: 59.91525, lon: 10.63585 }
-		},
-		"Lag 5": {
-		"Post 1": { lat: 59.91121, lon: 10.64012 },
-		"Post 2": { lat: 59.90945, lon: 10.64233 },
-		"Post 3": { lat: 59.91237, lon: 10.64106 },
-		"Post 4": { lat: 59.91461, lon: 10.63511 },
-		"Post 5": { lat: 59.91489, lon: 10.63708 }
-		},
-		"Lag 6": {
-		"Post 1": { lat: 59.91121, lon: 10.64012 },
-		"Post 2": { lat: 59.90803, lon: 10.64145 },
-		"Post 3": { lat: 59.91334, lon: 10.63987 },
-		"Post 4": { lat: 59.91488, lon: 10.63557 },
-		"Post 5": { lat: 59.91547, lon: 10.6344 }
-		},
-		"Lag 7": {
-		"Post 1": { lat: 59.91121, lon: 10.64012 },
-		"Post 2": { lat: 59.90974, lon: 10.64114 },
-		"Post 3": { lat: 59.91267, lon: 10.63648 },
-		"Post 4": { lat: 59.91522, lon: 10.6362 },
-		"Post 5": { lat: 59.91484, lon: 10.63545 }
-		},
-		"Lag 8": {
-		"Post 1": { lat: 59.91121, lon: 10.64012 },
-		"Post 2": { lat: 59.9104, lon: 10.64078 },
-		"Post 3": { lat: 59.91255, lon: 10.63572 },
-		"Post 4": { lat: 59.91527, lon: 10.63594 },
-		"Post 5": { lat: 59.91474, lon: 10.63521 }
-		},
-		"Lag 9": {
-		"Post 1": { lat: 59.91121, lon: 10.64012 },
-		"Post 2": { lat: 59.91177, lon: 10.64124 },
-		"Post 3": { lat: 59.91281, lon: 10.64139 },
-		"Post 4": { lat: 59.91589, lon: 10.63764 },
-		"Post 5": { lat: 59.91551, lon: 10.63639 }
-		},
-		"Lag 10": {
-		"Post 1": { lat: 59.91121, lon: 10.64012 },
-		"Post 2": { lat: 59.90912, lon: 10.64264 },
-		"Post 3": { lat: 59.91248, lon: 10.64177 },
-		"Post 4": { lat: 59.91534, lon: 10.63733 },
-		"Post 5": { lat: 59.91524, lon: 10.63611 }
-		},
-		"Lag 11": {
-		"Post 1": { lat: 59.91121, lon: 10.64012 },
-		"Post 2": { lat: 59.90999, lon: 10.64242 },
-		"Post 3": { lat: 59.91315, lon: 10.6414 },
-		"Post 4": { lat: 59.91564, lon: 10.63867 },
-		"Post 5": { lat: 59.91534, lon: 10.63731 }
-		},
-		"Lag 12": {
-		"Post 1": { lat: 59.91121, lon: 10.64012 },
-		"Post 2": { lat: 59.91052, lon: 10.64187 },
-		"Post 3": { lat: 59.91306, lon: 10.64201 },
-		"Post 4": { lat: 59.91597, lon: 10.63831 },
-		"Post 5": { lat: 59.91569, lon: 10.63697 }
-		},
-	};
+  const postCoordinates = {
+    "Lag 1": {
+      "Post 1": { lat: 59.91121, lon: 10.64012 },
+      "Post 2": { lat: 59.90734, lon: 10.64204 },
+      "Post 3": { lat: 59.90945, lon: 10.64283 },
+      "Post 4": { lat: 59.91335, lon: 10.6398 },
+      "Post 5": { lat: 59.91451, lon: 10.6351 }
+    },
+    "Lag 2": {
+      "Post 1": { lat: 59.91121, lon: 10.64012 },
+      "Post 2": { lat: 59.90766, lon: 10.64204 },
+      "Post 3": { lat: 59.91018, lon: 10.64215 },
+      "Post 4": { lat: 59.91328, lon: 10.63892 },
+      "Post 5": { lat: 59.9148, lon: 10.63539 }
+    },
+    "Lag 3": {
+      "Post 1": { lat: 59.91121, lon: 10.64012 },
+      "Post 2": { lat: 59.90833, lon: 10.64042 },
+      "Post 3": { lat: 59.911, lon: 10.64145 },
+      "Post 4": { lat: 59.91391, lon: 10.63467 },
+      "Post 5": { lat: 59.91507, lon: 10.636 }
+    },
+    "Lag 4": {
+      "Post 1": { lat: 59.91121, lon: 10.64012 },
+      "Post 2": { lat: 59.90947, lon: 10.64286 },
+      "Post 3": { lat: 59.91173, lon: 10.64137 },
+      "Post 4": { lat: 59.91459, lon: 10.6336 },
+      "Post 5": { lat: 59.91525, lon: 10.63585 }
+    },
+    "Lag 5": {
+      "Post 1": { lat: 59.91121, lon: 10.64012 },
+      "Post 2": { lat: 59.90945, lon: 10.64233 },
+      "Post 3": { lat: 59.91237, lon: 10.64106 },
+      "Post 4": { lat: 59.91461, lon: 10.63511 },
+      "Post 5": { lat: 59.91489, lon: 10.63708 }
+    },
+    "Lag 6": {
+      "Post 1": { lat: 59.91121, lon: 10.64012 },
+      "Post 2": { lat: 59.90803, lon: 10.64145 },
+      "Post 3": { lat: 59.91334, lon: 10.63987 },
+      "Post 4": { lat: 59.91488, lon: 10.63557 },
+      "Post 5": { lat: 59.91547, lon: 10.6344 }
+    },
+    "Lag 7": {
+      "Post 1": { lat: 59.91121, lon: 10.64012 },
+      "Post 2": { lat: 59.90974, lon: 10.64114 },
+      "Post 3": { lat: 59.91267, lon: 10.63648 },
+      "Post 4": { lat: 59.91522, lon: 10.6362 },
+      "Post 5": { lat: 59.91484, lon: 10.63545 }
+    },
+    "Lag 8": {
+      "Post 1": { lat: 59.91121, lon: 10.64012 },
+      "Post 2": { lat: 59.9104, lon: 10.64078 },
+      "Post 3": { lat: 59.91255, lon: 10.63572 },
+      "Post 4": { lat: 59.91527, lon: 10.63594 },
+      "Post 5": { lat: 59.91474, lon: 10.63521 }
+    },
+    "Lag 9": {
+      "Post 1": { lat: 59.91121, lon: 10.64012 },
+      "Post 2": { lat: 59.91177, lon: 10.64124 },
+      "Post 3": { lat: 59.91281, lon: 10.64139 },
+      "Post 4": { lat: 59.91589, lon: 10.63764 },
+      "Post 5": { lat: 59.91551, lon: 10.63639 }
+    },
+    "Lag 10": {
+      "Post 1": { lat: 59.91121, lon: 10.64012 },
+      "Post 2": { lat: 59.90912, lon: 10.64264 },
+      "Post 3": { lat: 59.91248, lon: 10.64177 },
+      "Post 4": { lat: 59.91534, lon: 10.63733 },
+      "Post 5": { lat: 59.91524, lon: 10.63611 }
+    },
+    "Lag 11": {
+      "Post 1": { lat: 59.91121, lon: 10.64012 },
+      "Post 2": { lat: 59.90999, lon: 10.64242 },
+      "Post 3": { lat: 59.91315, lon: 10.6414 },
+      "Post 4": { lat: 59.91564, lon: 10.63867 },
+      "Post 5": { lat: 59.91534, lon: 10.63731 }
+    },
+    "Lag 12": {
+      "Post 1": { lat: 59.91121, lon: 10.64012 },
+      "Post 2": { lat: 59.91052, lon: 10.64187 },
+      "Post 3": { lat: 59.91306, lon: 10.64201 },
+      "Post 4": { lat: 59.91597, lon: 10.63831 },
+      "Post 5": { lat: 59.91569, lon: 10.63697 }
+    },
+  };
 
-	const quizQuestions = {
-	    "Post 1": "Koden til skjma er: 1605",
-	    "Post 2": "Koden til skjma er: 2107",
-	    "Post 3": "Koden til skjma er: 1911",
-	    "Post 4": "Koden til skjma er: 0306",
-	    "Post 5": "Koden til skjma er: 1111"
-	};
+  const quizQuestions = {
+    "Post 1": "Koden til skjma er: 1605",
+    "Post 2": "Koden til skjma er: 2107",
+    "Post 3": "Koden til skjma er: 1911",
+    "Post 4": "Koden til skjma er: 0306",
+    "Post 5": "Koden til skjma er: 1111"
+  };
 
-  	const maxDistanceMeters = 25;
+  const maxDistanceMeters = 25;
 
-	function checkPosition() {
-		const team = document.getElementById("team").value;
-		const post = document.getElementById("post").value;
-		const msg = document.getElementById("message");
-		const questionBox = document.getElementById("question");
-		
-		// Finn neste post
-		const postNum = parseInt(post.split(" ")[1]);
-		const nextPostKey = "Post " + (postNum + 1);
-		const nextPost = postCoordinates[team][nextPostKey];
-		
-		const nextCoordsDiv = document.getElementById("nextCoords");
-	
-		if (nextPost) {
-			const lat = nextPost.lat.toFixed(5);
-			const lon = nextPost.lon.toFixed(5);
-			const nextInfo = `Når dere har levert svar på spørsmålene, så er finner dere neste post her:<br>Neste post - ${nextPostKey}: Lat ${lat}, Lon ${lon}`;
-			const gmapLink = `https://www.google.com/maps?q=${lat},${lon}`;
-			nextCoordsDiv.innerHTML = `
-			<p>${nextInfo}</p>
-			<p><a href="${gmapLink}" target="_blank">Vis i Google Maps</a></p>
-			`;
-		} else {
-			nextCoordsDiv.innerHTML = `<p>Dette er siste post!<br>Svar på spørsmålene, så er....<br>Møllefossen neste! 🍺</p>`;
-		}
+  function checkPosition() {
+    const team = document.getElementById("team").value;
+    const post = document.getElementById("post").value;
+    const msg = document.getElementById("message");
+    const questionBox = document.getElementById("question");
 
-    		msg.innerText = "";
-		questionBox.innerText = "";
-		
-		if (!team || !post) {
-			msg.innerText = "Velg både lag og post.";
-			return;
-		}
-		
-		if (!postCoordinates[team] || !postCoordinates[team][post]) {
-			msg.innerText = "Ingen lokasjon definert for dette laget og denne posten.";
-			return;
-		}
-		
-		if (!navigator.geolocation) {
-			msg.innerText = "Geolokasjon støttes ikke av nettleseren.";
-			return;
-		}
-		
-		navigator.geolocation.getCurrentPosition(
-		      	function(position) {
-			        const userLat = position.coords.latitude;
-			        const userLon = position.coords.longitude;
-			        const target = postCoordinates[team][post];
-			
-			        const dist = distanceInMeters(userLat, userLon, target.lat, target.lon);
-				const clockDir = bearingToClockDirection(userLat, userLon, target.lat, target.lon);
-			
-			        if (dist <= maxDistanceMeters) {
-				          questionBox.innerText = quizQuestions[post] || "Ingen spørsmål definert.";
-				} else {
-				          msg.innerText = `Du er ${Math.round(dist)} meter unna riktig posisjon. Gå nærmere posten.\nRetning mot posten: kl. ${clockDir}.\n(Klokka 12 er rett mot Nord)`;
-			        }
-			},
-			function(error) {
-				msg.innerText = "Klarte ikke hente posisjon: " + error.message;
-			}
-		);
-	  }
+    const postNum = parseInt(post.split(" ")[1]);
+    const nextPostKey = "Post " + (postNum + 1);
+    const nextPost = postCoordinates[team] && postCoordinates[team][nextPostKey];
 
-	  function distanceInMeters(lat1, lon1, lat2, lon2) {
-		const R = 6371000; //Jordens radius
-		const φ1 = lat1 * Math.PI / 180;
-		const φ2 = lat2 * Math.PI / 180;
-		const Δφ = (lat2 - lat1) * Math.PI / 180;
-		const Δλ = (lon2 - lon1) * Math.PI / 180;
-		
-		const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
-		      Math.cos(φ1) * Math.cos(φ2) *
-		      Math.sin(Δλ / 2) ** 2;
-		const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-		
-		return R * c;
-	}
+    const nextCoordsDiv = document.getElementById("nextCoords");
 
-	function bearingToClockDirection(lat1, lon1, lat2, lon2) {
-		const φ1 = lat1 * Math.PI / 180;
-		const φ2 = lat2 * Math.PI / 180;
-		const Δλ = (lon2 - lon1) * Math.PI / 180;
-		
-		const y = Math.sin(Δλ) * Math.cos(φ2);
-		const x = Math.cos(φ1) * Math.sin(φ2) -
-		    Math.sin(φ1) * Math.cos(φ2) * Math.cos(Δλ);
-		const θ = Math.atan2(y, x);
-		const bearing = (θ * 180 / Math.PI + 360) % 360; // 0–360 grader
-		
-		const clockHour = Math.round(((bearing + 15) % 360) / 30); // 12 deler på 360°
-		return clockHour === 0 ? 12 : clockHour;
-	}
-	  
-</script>
+    if (nextPost) {
+      const lat = nextPost.lat.toFixed(5);
+      const lon = nextPost.lon.toFixed(5);
+      const gmapLink = `https://www.google.com/maps?q=${lat},${lon}`;
+      nextCoordsDiv.innerHTML = `
+        <p>Når dere har levert svar på spørsmålene finner dere neste post her:<br>
+        <strong>${nextPostKey}:</strong> Lat ${lat}, Lon ${lon}</p>
+        <p><a href="${gmapLink}" target="_blank">Vis i Google Maps 🗺️</a></p>
+      `;
+    } else if (post) {
+      nextCoordsDiv.innerHTML = `<p>Dette er siste post!<br>Svar på spørsmålene, så er...<br>Møllefossen neste! 🍺</p>`;
+    } else {
+      nextCoordsDiv.innerHTML = "";
+    }
 
+    msg.innerText = "";
+    questionBox.innerText = "";
+
+    if (!team || !post) {
+      msg.innerText = "Velg både lag og post.";
+      return;
+    }
+
+    if (!postCoordinates[team] || !postCoordinates[team][post]) {
+      msg.innerText = "Ingen lokasjon definert for dette laget og denne posten.";
+      return;
+    }
+
+    if (!navigator.geolocation) {
+      msg.innerText = "Geolokasjon støttes ikke av nettleseren.";
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      function(position) {
+        const userLat = position.coords.latitude;
+        const userLon = position.coords.longitude;
+        const target = postCoordinates[team][post];
+
+        const dist = distanceInMeters(userLat, userLon, target.lat, target.lon);
+        const clockDir = bearingToClockDirection(userLat, userLon, target.lat, target.lon);
+
+        if (dist <= maxDistanceMeters) {
+          questionBox.innerText = quizQuestions[post] || "Ingen spørsmål definert.";
+        } else {
+          msg.innerText = `Du er ${Math.round(dist)} meter unna riktig posisjon. Gå nærmere posten.\nRetning mot posten: kl. ${clockDir}.\n(Klokka 12 er rett mot Nord)`;
+        }
+      },
+      function(error) {
+        msg.innerText = "Klarte ikke hente posisjon: " + error.message;
+      }
+    );
+  }
+
+  function distanceInMeters(lat1, lon1, lat2, lon2) {
+    const R = 6371000;
+    const φ1 = lat1 * Math.PI / 180;
+    const φ2 = lat2 * Math.PI / 180;
+    const Δφ = (lat2 - lat1) * Math.PI / 180;
+    const Δλ = (lon2 - lon1) * Math.PI / 180;
+
+    const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+          Math.cos(φ1) * Math.cos(φ2) *
+          Math.sin(Δλ / 2) ** 2;
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+    return R * c;
+  }
+
+  function bearingToClockDirection(lat1, lon1, lat2, lon2) {
+    const φ1 = lat1 * Math.PI / 180;
+    const φ2 = lat2 * Math.PI / 180;
+    const Δλ = (lon2 - lon1) * Math.PI / 180;
+
+    const y = Math.sin(Δλ) * Math.cos(φ2);
+    const x = Math.cos(φ1) * Math.sin(φ2) -
+        Math.sin(φ1) * Math.cos(φ2) * Math.cos(Δλ);
+    const θ = Math.atan2(y, x);
+    const bearing = (θ * 180 / Math.PI + 360) % 360;
+
+    const clockHour = Math.round(((bearing + 15) % 360) / 30);
+    return clockHour === 0 ? 12 : clockHour;
+  }
+  </script>
 
 </body>
 </html>

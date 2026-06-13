@@ -3,95 +3,308 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Toppliste – Quizresultater</title>
+  <title>Toppliste – Sommerquiz</title>
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-      body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      background: #e0f7fa;
-      color: #004d40;
-    } 
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Nunito', Arial, sans-serif;
+      min-height: 100vh;
+      background: linear-gradient(160deg, #87CEEB 0%, #FFF176 55%, #FFB74D 100%);
+      color: #3e2723;
+      overflow-x: hidden;
+    }
+
+    .sun {
+      position: fixed;
+      top: -60px; right: -60px;
+      width: 200px; height: 200px;
+      background: radial-gradient(circle, #FFE082 40%, #FFB300 70%, transparent 100%);
+      border-radius: 50%;
+      animation: pulse-sun 4s ease-in-out infinite;
+      z-index: 0; pointer-events: none;
+    }
+
+    @keyframes pulse-sun {
+      0%, 100% { transform: scale(1); opacity: 0.85; }
+      50% { transform: scale(1.08); opacity: 1; }
+    }
+
+    .wave-wrapper {
+      position: fixed; bottom: 0; left: 0;
+      width: 100%; pointer-events: none; z-index: 0;
+    }
+    .wave-wrapper svg { display: block; width: 100%; }
 
     .container {
-      padding: 20px;
-      max-width: 600px;
-      margin: auto;
+      position: relative; z-index: 1;
+      padding: 40px 20px 120px;
+      max-width: 680px; margin: auto;
     }
+
+    .card {
+      background: rgba(255, 255, 255, 0.75);
+      backdrop-filter: blur(8px);
+      border-radius: 24px;
+      padding: 36px 32px;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.12);
+    }
+
+    .back-button {
+      display: inline-flex; align-items: center; gap: 6px;
+      margin-bottom: 24px; padding: 10px 16px;
+      background: linear-gradient(135deg, #29B6F6, #0288D1);
+      color: white; text-decoration: none; border-radius: 10px;
+      font-weight: 700; font-size: 0.9em;
+      box-shadow: 0 4px 12px rgba(2,136,209,0.3);
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .back-button:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(2,136,209,0.45); }
 
     h1 {
-      text-align: center;
-      color: #00796b;
+      font-family: 'Pacifico', cursive;
+      text-align: center; font-size: 2em;
+      color: #E65100; text-shadow: 2px 2px 0 #FFE082;
+      margin-bottom: 16px; line-height: 1.2;
     }
 
-    h2 {
-      text-align: center;
-      color: #00796b;
-    }
-    
-    h3 {
-      text-align: center;
-      color: #00796b;
+    .divider {
+      border: none; height: 3px;
+      background: linear-gradient(to right, #FFB300, #FF7043, #FFB300);
+      border-radius: 2px; margin: 0 0 24px;
     }
 
-      .back-button {
-      display: inline-block;
-      margin: 15px 0 25px;
-      padding: 10px 15px;
-      background-color: #00796b;
+    /* Tab buttons */
+    .tabs {
+      display: flex; gap: 8px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 28px;
+    }
+
+    .tab-btn {
+      padding: 10px 20px;
+      border: none; border-radius: 20px;
+      font-family: 'Nunito', Arial, sans-serif;
+      font-size: 0.9em; font-weight: 700;
+      cursor: pointer;
+      background: rgba(255,255,255,0.5);
+      color: #5d4037;
+      border: 2px solid transparent;
+      transition: all 0.2s;
+    }
+
+    .tab-btn:hover { background: rgba(255,255,255,0.8); }
+
+    .tab-btn.active {
+      background: linear-gradient(135deg, #FF7043, #FF5722);
       color: white;
-      text-decoration: none;
-      border-radius: 6px;
-      font-weight: bold;
-      transition: background-color 0.3s;
+      box-shadow: 0 4px 12px rgba(255,87,34,0.35);
     }
 
-    .back-button:hover {
-      background-color: #004d40;
+    /* ── Podium ── */
+    .podium-wrapper {
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      gap: 12px;
+      margin: 24px 0 32px;
+      height: 220px;
     }
 
-    canvas { max-width: 600px; margin: 30px auto; display: block; }
-    table { border-collapse: collapse; margin: 0px auto; width: 95%; }
-    th, td { border: 1px solid #bbb; padding: 8px; text-align: center; }
-    th { background: #eee; }
-    tr:nth-child(even) { background: #f9f9f9; }
+    .podium-place {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex: 1;
+      max-width: 160px;
+    }
+
+    .podium-name {
+      font-weight: 800;
+      font-size: 0.9em;
+      text-align: center;
+      margin-bottom: 4px;
+      color: #3e2723;
+      word-break: break-word;
+    }
+
+    .podium-lagname {
+      font-size: 0.8em;
+      color: #8d6e63;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 2px;
+    }
+
+    .podium-score {
+      font-size: 1.1em;
+      font-weight: 800;
+      color: #E65100;
+      margin-bottom: 6px;
+    }
+
+    .podium-block {
+      width: 100%;
+      border-radius: 12px 12px 0 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 2em;
+      font-weight: 800;
+      color: white;
+      padding-top: 12px;
+    }
+
+    .podium-block .rank-num {
+      font-size: 0.55em;
+      font-weight: 800;
+      letter-spacing: 1px;
+      opacity: 0.85;
+    }
+
+    .podium-place.first .podium-block  { height: 170px; background: linear-gradient(160deg, #FFD700, #FFA000); }
+    .podium-place.second .podium-block { height: 130px; background: linear-gradient(160deg, #B0BEC5, #78909C); }
+    .podium-place.third .podium-block  { height: 100px; background: linear-gradient(160deg, #FFAB76, #E65100); }
+
+    /* ── Runner-up list ── */
+    .runner-up-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .runner-up-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      background: rgba(255,255,255,0.55);
+      border-radius: 12px;
+      padding: 12px 18px;
+      font-weight: 700;
+    }
+
+    .runner-up-rank {
+      font-size: 1.4em;
+      min-width: 36px;
+      text-align: center;
+    }
+
+    .runner-up-info {
+      flex: 1;
+    }
+
+    .runner-up-lagname {
+      font-size: 0.75em;
+      color: #8d6e63;
+      font-weight: 700;
+    }
+
+    .runner-up-score {
+      font-size: 1em;
+      color: #E65100;
+      font-weight: 800;
+    }
+
+    /* ── Tables ── */
+    .table-wrapper { overflow-x: auto; margin-top: 8px; }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      font-size: 0.9em;
+    }
+
+    th {
+      background: linear-gradient(135deg, #FF7043, #FF5722);
+      color: white;
+      padding: 10px 12px;
+      font-weight: 800;
+      text-align: center;
+      letter-spacing: 0.5px;
+    }
+
+    th:first-child { border-radius: 8px 0 0 0; }
+    th:last-child  { border-radius: 0 8px 0 0; }
+
+    td {
+      padding: 9px 12px;
+      text-align: center;
+      border-bottom: 1px solid rgba(0,0,0,0.06);
+    }
+
+    tr:nth-child(even) td { background: rgba(255,255,255,0.4); }
+    tr:nth-child(odd)  td { background: rgba(255,255,255,0.15); }
+
+    tr.rank-1 td { background: rgba(255,215,0,0.25) !important; font-weight: 800; }
+    tr.rank-2 td { background: rgba(176,190,197,0.25) !important; font-weight: 700; }
+    tr.rank-3 td { background: rgba(255,171,118,0.25) !important; font-weight: 700; }
+
+    tr:last-child td:first-child { border-radius: 0 0 0 8px; }
+    tr:last-child td:last-child  { border-radius: 0 0 8px 0; }
+
+    .loading {
+      text-align: center;
+      padding: 32px;
+      color: #8d6e63;
+      font-style: italic;
+    }
   </style>
 </head>
 
 <body>
+  <div class="sun"></div>
+
   <div class="container">
-    <a class="back-button" href="https://andersnyhus.github.io/anypage/">← Tilbake til startside</a>
-   
-    
-    <div style="text-align: center;">
-      <a class="back-button" onclick="showView('chart')">Graf - Topp 5</a>
-      <a class="back-button" onclick="showView('table')">Tabell - alle lag</a>
-      <a class="back-button" onclick="showView('detailed')">Detaljert visning</a>
-    </div>
-    
-    <div id="chartView">
-      <h2>Topp 5</h2>
-      <canvas id="scoreChart"></canvas>
-    </div>
-    
-    <div id="tableView" style="display: none;">
-      <h2>Poengoversikt</h2>
-      <table id="resultTable">
-        <thead id="tableHeader"></thead>
-        <tbody></tbody>
-      </table>
-    </div>
-   <div id="detailedView" style="display: none;">
-    <h2>Detaljert resultat</h2>
-    <p>Roter skjerm for bedre visning</p>
-    <table id="detailedTable">
-      <thead id="detailedHeader"></thead>
-      <tbody></tbody>
-    </table>
-  </div>     
+    <div class="card">
+      <a class="back-button" href="https://andersnyhus.github.io/anypage/">← Tilbake til startside</a>
 
+      <h1>Resultater 🏆</h1>
+      <hr class="divider">
 
+      <div class="tabs">
+        <button class="tab-btn active" onclick="showView('chart')">🏅 Topp 5</button>
+        <button class="tab-btn"        onclick="showView('table')">📊 Alle lag</button>
+        <button class="tab-btn"        onclick="showView('detailed')">🔍 Detaljert</button>
+      </div>
+
+      <div id="chartView">
+        <div id="podium" class="podium-wrapper">
+          <div class="loading">Laster resultater…</div>
+        </div>
+        <div id="runnerUp" class="runner-up-list"></div>
+      </div>
+
+      <div id="tableView" style="display:none;">
+        <div class="table-wrapper">
+          <table id="resultTable">
+            <thead id="tableHeader"></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div id="detailedView" style="display:none;">
+        <p style="text-align:center; font-size:0.85em; color:#8d6e63; margin-bottom:12px;">Roter skjerm for bedre visning</p>
+        <div class="table-wrapper">
+          <table id="detailedTable">
+            <thead id="detailedHeader"></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="wave-wrapper">
+    <svg viewBox="0 0 1440 120" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+      <path d="M0,60 C240,110 480,10 720,60 C960,110 1200,10 1440,60 L1440,120 L0,120 Z" fill="rgba(2,136,209,0.35)"/>
+      <path d="M0,80 C300,30 600,110 900,70 C1100,45 1300,90 1440,75 L1440,120 L0,120 Z" fill="rgba(2,136,209,0.55)"/>
+    </svg>
   </div>
 
   <script>
@@ -106,49 +319,66 @@
 
       const rows = json.table.rows.map(r => r.c.map(c => c?.v ?? ""));
 
-      const data = rows.map(row => ({ 
-        Lag: row[0], 
+      const data = rows.map(row => ({
+        Lag:    row[0],
         Post_2: parseFloat(row[1]),
         Post_3: parseFloat(row[2]),
         Post_4: parseFloat(row[3]),
         Post_5: parseFloat(row[4]),
-        poeng: parseFloat(row[5]),
-        Navn: row[6],
-        Juks: row[7]
+        poeng:  parseFloat(row[5]),
+        Navn:   row[6],
+        Juks:   row[7]
       }));
-      
-      const top5 = data.sort((a, b) => b.poeng - a.poeng).slice(0, 5);
-      const top13 = data.sort((a, b) => b.poeng - a.poeng).slice(0, 13);
 
-      const labels = top5.map(e => e.Lag);
-      const values = top5.map(e => e.poeng);
+      const sorted = [...data].sort((a, b) => b.poeng - a.poeng);
+      const top5   = sorted.slice(0, 5);
+      const top13  = sorted.slice(0, 13);
 
-      drawChart(labels, values);
+      drawPodium(top5);
+      drawRunnerUp(top5);
       drawTable(top13);
       drawDetailedTable(top13);
     }
 
-    function drawChart(labels, values) {
-      new Chart(document.getElementById('scoreChart'), {
-        type: 'bar',
-        data: {
-          labels: labels,
-          datasets: [{
-            label: 'Poeng',
-            data: values,
-            backgroundColor: 'steelblue',
-            borderRadius: 4
-          }]
-        },
-        options: {
-          responsive: true,
-          plugins: {
-            legend: { display: false }
-          },
-          scales: {
-            y: { beginAtZero: true }
-          }
-        }
+    function drawPodium(top5) {
+      const medals  = ['🥇', '🥈', '🥉'];
+      const classes = ['first', 'second', 'third'];
+      const order   = [1, 0, 2]; // 2nd left, 1st centre, 3rd right
+
+      const podium = document.getElementById('podium');
+      podium.innerHTML = '';
+
+      order.forEach(i => {
+        if (!top5[i]) return;
+        const el = document.createElement('div');
+        el.className = `podium-place ${classes[i]}`;
+        el.innerHTML = `
+          <div class="podium-name">${top5[i].Lag}</div>
+          ${top5[i].Navn ? `<div class="podium-lagname">${top5[i].Navn}</div>` : ''}
+          <div class="podium-score">${top5[i].poeng} p</div>
+          <div class="podium-block">
+            ${medals[i]}
+            <span class="rank-num">${i + 1}. PLASS</span>
+          </div>`;
+        podium.appendChild(el);
+      });
+    }
+
+    function drawRunnerUp(top5) {
+      const icons = ['4️⃣', '5️⃣'];
+      const list  = document.getElementById('runnerUp');
+      list.innerHTML = '';
+      [3, 4].forEach((i, j) => {
+        if (!top5[i]) return;
+        const el = document.createElement('div');
+        el.className = 'runner-up-item';
+        el.innerHTML = `
+          <div class="runner-up-rank">${icons[j]}</div>
+          <div class="runner-up-info">
+            <div>${top5[i].Lag}${top5[i].Navn ? ` – <span class="runner-up-lagname">${top5[i].Navn}</span>` : ''}</div>
+          </div>
+          <div class="runner-up-score">${top5[i].poeng} p</div>`;
+        list.appendChild(el);
       });
     }
 
@@ -156,45 +386,48 @@
       const columns = ["Lag", "Post_2", "Post_3", "Post_4", "Post_5", "poeng"];
       const modifiedData = data.map(row => ({
         ...row,
-        Lag: row.Lag.replace(/^Lag\s*/i, "")  // Fjerner "Lag " i starten
+        Lag: row.Lag.replace(/^Lag\s*/i, "")
       }));
       renderTable("resultTable", "tableHeader", modifiedData, columns);
     }
-    
+
     function drawDetailedTable(data) {
       const columns = ["Lag", "Navn", "Post_2", "Post_3", "Post_4", "Post_5", "poeng", "Juks"];
       renderTable("detailedTable", "detailedHeader", data, columns);
     }
-    
+
     function renderTable(tableId, headerId, data, columns) {
       const headerMap = {
-        Lag: "Lag",
-        Navn: "Navn",
-        Post_2: "Post 2",
-        Post_3: "Post 3",
-        Post_4: "Post 4",
-        Post_5: "Post 5",
-        poeng: "Sum",
-        Juks: "QC"
+        Lag: "Lag", Navn: "Navn",
+        Post_2: "Post 2", Post_3: "Post 3", Post_4: "Post 4", Post_5: "Post 5",
+        poeng: "Sum", Juks: "QC"
       };
-    
+      const medals = ['🥇', '🥈', '🥉'];
+
       const thead = document.getElementById(headerId);
       thead.innerHTML = `<tr>${columns.map(c => `<th>${headerMap[c]}</th>`).join("")}</tr>`;
-    
-      const tbody = document.getElementById(tableId).querySelector("tbody");
-      tbody.innerHTML = data.map(row =>
-        `<tr>${columns.map(c => `<td>${row[c] ?? ""}</td>`).join("")}</tr>`
-      ).join('');
-    }
 
+      const tbody = document.getElementById(tableId).querySelector("tbody");
+      tbody.innerHTML = data.map((row, i) => {
+        const rankClass = i < 3 ? ` class="rank-${i+1}"` : '';
+        const lagDisplay = i < 3
+          ? `${medals[i]} ${row.Lag ?? ''}`
+          : (row.Lag ?? '');
+        return `<tr${rankClass}>${columns.map(c =>
+          `<td>${c === 'Lag' ? lagDisplay : (row[c] ?? '')}</td>`
+        ).join("")}</tr>`;
+      }).join('');
+    }
 
     function showView(view) {
-      document.getElementById('chartView').style.display = view === 'chart' ? 'block' : 'none';
-      document.getElementById('tableView').style.display = view === 'table' ? 'block' : 'none';
-      document.getElementById('detailedView').style.display = view === 'detailed' ? 'block' : 'none';
+      ['chart','table','detailed'].forEach(v => {
+        document.getElementById(v + 'View').style.display = v === view ? 'block' : 'none';
+      });
+      document.querySelectorAll('.tab-btn').forEach((btn, i) => {
+        btn.classList.toggle('active', ['chart','table','detailed'][i] === view);
+      });
     }
 
-      
     window.addEventListener('DOMContentLoaded', fetchChartData);
   </script>
 </body>

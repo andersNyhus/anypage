@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Fasit – Sommerquiz</title>
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Nunito', Arial, sans-serif;
+      min-height: 100vh;
+      background: linear-gradient(160deg, #87CEEB 0%, #FFF176 55%, #FFB74D 100%);
+      color: #3e2723;
+      overflow-x: hidden;
+    }
+
+    .sun {
+      position: fixed;
+      top: -60px;
+      right: -60px;
+      width: 200px;
+      height: 200px;
+      background: radial-gradient(circle, #FFE082 40%, #FFB300 70%, transparent 100%);
+      border-radius: 50%;
+      animation: pulse-sun 4s ease-in-out infinite;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    @keyframes pulse-sun {
+      0%, 100% { transform: scale(1); opacity: 0.85; }
+      50% { transform: scale(1.08); opacity: 1; }
+    }
+
+    .wave-wrapper {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .wave-wrapper svg {
+      display: block;
+      width: 100%;
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      padding: 40px 20px 120px;
+      max-width: 620px;
+      margin: auto;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.75);
+      backdrop-filter: blur(8px);
+      border-radius: 24px;
+      padding: 36px 32px;
+      box-shadow: 0 8px 40px rgba(0, 0, 0, 0.12);
+    }
+
+    .back-button {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 24px;
+      padding: 10px 16px;
+      background: linear-gradient(135deg, #29B6F6, #0288D1);
+      color: white;
+      text-decoration: none;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 0.9em;
+      box-shadow: 0 4px 12px rgba(2, 136, 209, 0.3);
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+
+    .back-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(2, 136, 209, 0.45);
+    }
+
+    h1 {
+      font-family: 'Pacifico', cursive;
+      text-align: center;
+      font-size: 2em;
+      color: #E65100;
+      text-shadow: 2px 2px 0 #FFE082;
+      margin-bottom: 16px;
+      line-height: 1.2;
+    }
+
+    .divider {
+      border: none;
+      height: 3px;
+      background: linear-gradient(to right, #FFB300, #FF7043, #FFB300);
+      border-radius: 2px;
+      margin: 0 0 24px;
+    }
+
+    .content {
+      font-size: 1em;
+      line-height: 1.65;
+      color: #4e342e;
+    }
+
+    .post-section {
+      margin-bottom: 28px;
+    }
+
+    .post-title {
+      font-family: 'Pacifico', cursive;
+      font-size: 1.2em;
+      color: #0288D1;
+      margin-bottom: 14px;
+    }
+
+    .qa-item {
+      background: rgba(255, 255, 255, 0.5);
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin-bottom: 10px;
+    }
+
+    .qa-item .question {
+      font-weight: 700;
+      color: #3e2723;
+      margin-bottom: 4px;
+    }
+
+    .qa-item .answer {
+      color: #388E3C;
+      font-weight: 700;
+    }
+
+    .post-divider {
+      border: none;
+      height: 2px;
+      background: linear-gradient(to right, transparent, #FFB300, transparent);
+      margin: 24px 0;
+    }
+
+    .pending-message {
+      text-align: center;
+      font-size: 1.15em;
+      color: #8d6e63;
+      padding: 20px 0;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="sun"></div>
+
+  <div class="container">
+    <div class="card">
+      <a class="back-button" href="./index.html">← Tilbake til startside</a>
+
+      <h1>Fasit ✅</h1>
+      <hr class="divider">
+
+      <div class="content" id="fasit-content">
+        <!-- Filled by script below -->
+      </div>
+    </div>
+  </div>
+
+  <div class="wave-wrapper">
+    <svg viewBox="0 0 1440 120" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+      <path d="M0,60 C240,110 480,10 720,60 C960,110 1200,10 1440,60 L1440,120 L0,120 Z" fill="rgba(2,136,209,0.35)"/>
+      <path d="M0,80 C300,30 600,110 900,70 C1100,45 1300,90 1440,75 L1440,120 L0,120 Z" fill="rgba(2,136,209,0.55)"/>
+    </svg>
+  </div>
+
+  <script>
+    // ↓ Endre til true når quiz er ferdig og du vil vise svarene
+    const VIS_FASIT = false;
+    //const VIS_FASIT = true;
+
+    const fasitData = [
+      {
+        post: "Post 1",
+        spørsmål: [
+          { q: "Spørsmål 1", a: "Svar 1" },
+          { q: "Spørsmål 2", a: "Svar 2" },
+          { q: "Spørsmål 3", a: "Svar 3" },
+          { q: "Spørsmål 4", a: "Svar 4" },
+          { q: "Spørsmål 5", a: "Svar 5" },
+        ]
+      },
+      {
+        post: "Post 2",
+        spørsmål: [
+          { q: "Spørsmål 1", a: "Svar 1" },
+          { q: "Spørsmål 2", a: "Svar 2" },
+          { q: "Spørsmål 3", a: "Svar 3" },
+          { q: "Spørsmål 4", a: "Svar 4" },
+          { q: "Spørsmål 5", a: "Svar 5" },
+        ]
+      },
+      {
+        post: "Post 3",
+        spørsmål: [
+          { q: "Spørsmål 1", a: "Svar 1" },
+          { q: "Spørsmål 2", a: "Svar 2" },
+          { q: "Spørsmål 3", a: "Svar 3" },
+          { q: "Spørsmål 4", a: "Svar 4" },
+          { q: "Spørsmål 5", a: "Svar 5" },
+        ]
+      },
+      {
+        post: "Post 4",
+        spørsmål: [
+          { q: "Spørsmål 1", a: "Svar 1" },
+          { q: "Spørsmål 2", a: "Svar 2" },
+          { q: "Spørsmål 3", a: "Svar 3" },
+          { q: "Spørsmål 4", a: "Svar 4" },
+          { q: "Spørsmål 5", a: "Svar 5" },
+        ]
+      },
+      {
+        post: "Post 5",
+        spørsmål: [
+          { q: "Spørsmål 1", a: "Svar 1" },
+          { q: "Spørsmål 2", a: "Svar 2" },
+          { q: "Spørsmål 3", a: "Svar 3" },
+          { q: "Spørsmål 4", a: "Svar 4" },
+          { q: "Spørsmål 5", a: "Svar 5" },
+        ]
+      }
+    ];
+
+    const container = document.getElementById('fasit-content');
+
+    if (!VIS_FASIT) {
+      container.innerHTML = `<p class="pending-message">Her kommer fasiten når alle er i mål! 🏁</p>`;
+    } else {
+      fasitData.forEach((post, idx) => {
+        const section = document.createElement('div');
+        section.className = 'post-section';
+
+        const items = post.spørsmål.map(s => `
+          <div class="qa-item">
+            <div class="question">${s.q}</div>
+            <div class="answer">→ ${s.a}</div>
+          </div>`).join('');
+
+        section.innerHTML = `
+          <div class="post-title">${post.post}</div>
+          ${items}`;
+
+        container.appendChild(section);
+
+        if (idx < fasitData.length - 1) {
+          const divider = document.createElement('hr');
+          divider.className = 'post-divider';
+          container.appendChild(divider);
+        }
+      });
+    }
+  </script>
+
+</body>
+</html>

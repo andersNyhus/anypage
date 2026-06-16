@@ -238,6 +238,10 @@
         <p>Har dere glemt hvor dere skulle? Velg forrige post — lokasjonen vises under «Neste post».</p>
       </div>
 
+      <div id="loadingStatus" style="text-align:center; padding: 10px 0 18px; font-size:0.9em; color:#8d6e63;">
+        ⏳ Laster koordinater…
+      </div>
+
       <div class="section-label">Velg lag og post</div>
       <div class="form-group">
         <div>
@@ -250,12 +254,6 @@
             <option value="Lag 4">Lag 4</option>
             <option value="Lag 5">Lag 5</option>
             <option value="Lag 6">Lag 6</option>
-            <option value="Lag 7">Lag 7</option>
-            <option value="Lag 8">Lag 8</option>
-            <option value="Lag 9">Lag 9</option>
-            <option value="Lag 10">Lag 10</option>
-            <option value="Lag 11">Lag 11</option>
-            <option value="Lag 12">Lag 12</option>
           </select>
         </div>
         <div>
@@ -267,6 +265,7 @@
             <option value="Post 3">Post 3</option>
             <option value="Post 4">Post 4</option>
             <option value="Post 5">Post 5</option>
+            
           </select>
         </div>
       </div>
@@ -287,141 +286,124 @@
   </div>
 
   <script>
-  const postCoordinates = {
-    "Lag 1": {
-      "Post 1": { lat: 59.91121, lon: 10.64012 },
-      "Post 2": { lat: 59.90734, lon: 10.64204 },
-      "Post 3": { lat: 59.90945, lon: 10.64283 },
-      "Post 4": { lat: 59.91335, lon: 10.6398 },
-      "Post 5": { lat: 59.91451, lon: 10.6351 }
-    },
-    "Lag 2": {
-      "Post 1": { lat: 59.91121, lon: 10.64012 },
-      "Post 2": { lat: 59.90766, lon: 10.64204 },
-      "Post 3": { lat: 59.91018, lon: 10.64215 },
-      "Post 4": { lat: 59.91328, lon: 10.63892 },
-      "Post 5": { lat: 59.9148, lon: 10.63539 }
-    },
-    "Lag 3": {
-      "Post 1": { lat: 59.91121, lon: 10.64012 },
-      "Post 2": { lat: 59.90833, lon: 10.64042 },
-      "Post 3": { lat: 59.911, lon: 10.64145 },
-      "Post 4": { lat: 59.91391, lon: 10.63467 },
-      "Post 5": { lat: 59.91507, lon: 10.636 }
-    },
-    "Lag 4": {
-      "Post 1": { lat: 59.91121, lon: 10.64012 },
-      "Post 2": { lat: 59.90947, lon: 10.64286 },
-      "Post 3": { lat: 59.91173, lon: 10.64137 },
-      "Post 4": { lat: 59.91459, lon: 10.6336 },
-      "Post 5": { lat: 59.91525, lon: 10.63585 }
-    },
-    "Lag 5": {
-      "Post 1": { lat: 59.91121, lon: 10.64012 },
-      "Post 2": { lat: 59.90945, lon: 10.64233 },
-      "Post 3": { lat: 59.91237, lon: 10.64106 },
-      "Post 4": { lat: 59.91461, lon: 10.63511 },
-      "Post 5": { lat: 59.91489, lon: 10.63708 }
-    },
-    "Lag 6": {
-      "Post 1": { lat: 59.91121, lon: 10.64012 },
-      "Post 2": { lat: 59.90803, lon: 10.64145 },
-      "Post 3": { lat: 59.91334, lon: 10.63987 },
-      "Post 4": { lat: 59.91488, lon: 10.63557 },
-      "Post 5": { lat: 59.91547, lon: 10.6344 }
-    },
-    "Lag 7": {
-      "Post 1": { lat: 59.91121, lon: 10.64012 },
-      "Post 2": { lat: 59.90974, lon: 10.64114 },
-      "Post 3": { lat: 59.91267, lon: 10.63648 },
-      "Post 4": { lat: 59.91522, lon: 10.6362 },
-      "Post 5": { lat: 59.91484, lon: 10.63545 }
-    },
-    "Lag 8": {
-      "Post 1": { lat: 59.91121, lon: 10.64012 },
-      "Post 2": { lat: 59.9104, lon: 10.64078 },
-      "Post 3": { lat: 59.91255, lon: 10.63572 },
-      "Post 4": { lat: 59.91527, lon: 10.63594 },
-      "Post 5": { lat: 59.91474, lon: 10.63521 }
-    },
-    "Lag 9": {
-      "Post 1": { lat: 59.91121, lon: 10.64012 },
-      "Post 2": { lat: 59.91177, lon: 10.64124 },
-      "Post 3": { lat: 59.91281, lon: 10.64139 },
-      "Post 4": { lat: 59.91589, lon: 10.63764 },
-      "Post 5": { lat: 59.91551, lon: 10.63639 }
-    },
-    "Lag 10": {
-      "Post 1": { lat: 59.91121, lon: 10.64012 },
-      "Post 2": { lat: 59.90912, lon: 10.64264 },
-      "Post 3": { lat: 59.91248, lon: 10.64177 },
-      "Post 4": { lat: 59.91534, lon: 10.63733 },
-      "Post 5": { lat: 59.91524, lon: 10.63611 }
-    },
-    "Lag 11": {
-      "Post 1": { lat: 59.91121, lon: 10.64012 },
-      "Post 2": { lat: 59.90999, lon: 10.64242 },
-      "Post 3": { lat: 59.91315, lon: 10.6414 },
-      "Post 4": { lat: 59.91564, lon: 10.63867 },
-      "Post 5": { lat: 59.91534, lon: 10.63731 }
-    },
-    "Lag 12": {
-      "Post 1": { lat: 59.91121, lon: 10.64012 },
-      "Post 2": { lat: 59.91052, lon: 10.64187 },
-      "Post 3": { lat: 59.91306, lon: 10.64201 },
-      "Post 4": { lat: 59.91597, lon: 10.63831 },
-      "Post 5": { lat: 59.91569, lon: 10.63697 }
-    },
-  };
+  // Koordinater lastes dynamisk fra CSV-filer i Maps/-mappen.
+  // Krever webserver (GitHub Pages eller VS Code Live Server) — fungerer ikke via file://.
+  //
+  // CSV-mapping:
+  //   Start_mål.csv  →  Punkt 1 = Post 1 (felles for alle lag), Punkt 2 = Mål
+  //   Lag X.csv      →  Punkt 1–4 = Post 2–5, Punkt 5 = destinasjon etter siste post
+
+  let postCoordinates = null;
+  let afterLastPost = null;
 
   const quizQuestions = {
-    "Post 1": "Koden til skjma er: 1605",
-    "Post 2": "Koden til skjma er: 2107",
-    "Post 3": "Koden til skjma er: 1911",
-    "Post 4": "Koden til skjma er: 0306",
-    "Post 5": "Koden til skjma er: 1111"
+    "Post 1": "Koden til skjema er: 1605",
+    "Post 2": "Koden til skjema er: 2107",
+    "Post 3": "Koden til skjema er: 1911",
+    "Post 4": "Koden til skjema er: 0306",
+    "Post 5": "Koden til skjema er: 1111",
+    "Post 6": "Koden til skjema er: 1111"
   };
 
   const maxDistanceMeters = 25;
+
+  function parseCSVPoints(text) {
+    return text.trim().split('\n').slice(1).map(line => {
+      const m = line.match(/POINT \(([0-9.]+) ([0-9.]+)\)/);
+      return m ? { lon: parseFloat(m[1]), lat: parseFloat(m[2]) } : null;
+    }).filter(Boolean);
+  }
+
+  async function loadAllCoordinates() {
+    const statusEl = document.getElementById('loadingStatus');
+    const base = './Maps/';
+    const lagNames = ['Lag 1', 'Lag 2', 'Lag 3', 'Lag 4', 'Lag 5', 'Lag 6'];
+
+    try {
+      const startRes = await fetch(base + encodeURIComponent('Quiz- 06 Start_mål.csv'));
+      if (!startRes.ok) throw new Error('Fant ikke Start_mål.csv');
+      const startPoints = parseCSVPoints(await startRes.text());
+      const post1 = startPoints[0]; // felles for alle lag
+
+      postCoordinates = {};
+
+      await Promise.all(lagNames.map(async lag => {
+        const res = await fetch(base + encodeURIComponent(`Quiz- 06_${lag}.csv`));
+        if (!res.ok) throw new Error(`Fant ikke ${lag}.csv`);
+        const pts = parseCSVPoints(await res.text());
+        postCoordinates[lag] = {
+          "Post 1": post1,
+          "Post 2": pts[0],
+          "Post 3": pts[1],
+          "Post 4": pts[2],
+          "Post 5": pts[3],
+        };
+        // pts[4] = destinasjon etter siste post (Helpdesk / Mål), lagres per lag
+        postCoordinates[lag]._afterLast = pts[4] || startPoints[1];
+      }));
+
+      statusEl.style.display = 'none';
+    } catch (e) {
+      statusEl.innerHTML = `⚠️ Koordinater kunne ikke lastes (${e.message}).<br>
+        Siden krever en webserver — bruk
+        <a href="https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer" target="_blank">VS Code Live Server</a>
+        lokalt, eller publiser til GitHub Pages.`;
+      statusEl.style.cssText = 'color:#c62828; background:rgba(198,40,40,0.1); border-radius:10px; padding:14px; margin-bottom:16px; font-size:0.9em;';
+    }
+  }
 
   function checkPosition() {
     const team = document.getElementById("team").value;
     const post = document.getElementById("post").value;
     const msg = document.getElementById("message");
     const questionBox = document.getElementById("question");
-
-    const postNum = parseInt(post.split(" ")[1]);
-    const nextPostKey = "Post " + (postNum + 1);
-    const nextPost = postCoordinates[team] && postCoordinates[team][nextPostKey];
-
     const nextCoordsDiv = document.getElementById("nextCoords");
-
-    if (nextPost) {
-      const lat = nextPost.lat.toFixed(5);
-      const lon = nextPost.lon.toFixed(5);
-      const gmapLink = `https://www.google.com/maps?q=${lat},${lon}`;
-      nextCoordsDiv.innerHTML = `
-        <p>Når dere har levert svar på spørsmålene finner dere neste post her:<br>
-        <strong>${nextPostKey}:</strong> Lat ${lat}, Lon ${lon}</p>
-        <p><a href="${gmapLink}" target="_blank">Vis i Google Maps 🗺️</a></p>
-      `;
-    } else if (post) {
-      nextCoordsDiv.innerHTML = `<p>Dette er siste post!<br>Svar på spørsmålene, så er...<br>Møllefossen neste! 🍺</p>`;
-    } else {
-      nextCoordsDiv.innerHTML = "";
-    }
 
     msg.innerText = "";
     questionBox.innerText = "";
+    nextCoordsDiv.innerHTML = "";
 
     if (!team || !post) {
       msg.innerText = "Velg både lag og post.";
       return;
     }
 
+    if (!postCoordinates) {
+      msg.innerText = "Koordinater er ikke lastet ennå. Sjekk feilmeldingen øverst.";
+      return;
+    }
+
     if (!postCoordinates[team] || !postCoordinates[team][post]) {
       msg.innerText = "Ingen lokasjon definert for dette laget og denne posten.";
       return;
+    }
+
+    // Vis neste post / mål
+    const postNum = parseInt(post.split(" ")[1]);
+    const nextPostKey = "Post " + (postNum + 1);
+    const nextPost = postCoordinates[team][nextPostKey];
+
+    if (nextPost) {
+      const lat = nextPost.lat.toFixed(5);
+      const lon = nextPost.lon.toFixed(5);
+      const gmapLink = `https://www.google.com/maps?q=${lat},${lon}`;
+      nextCoordsDiv.innerHTML = `
+        <p>Neste post finner dere her:<br>
+        <strong>${nextPostKey}:</strong> Lat ${lat}, Lon ${lon}</p>
+        <p><a href="${gmapLink}" target="_blank">Vis i Google Maps 🗺️</a></p>`;
+    } else {
+      const after = postCoordinates[team]._afterLast;
+      if (after) {
+        const lat = after.lat.toFixed(5);
+        const lon = after.lon.toFixed(5);
+        const gmapLink = `https://www.google.com/maps?q=${lat},${lon}`;
+        nextCoordsDiv.innerHTML = `
+          <p>Dette er siste post! Svar på spørsmålene, og gå til:<br>
+          <strong>Mål:</strong> Lat ${lat}, Lon ${lon} 🏁</p>
+          <p><a href="${gmapLink}" target="_blank">Vis i Google Maps 🗺️</a></p>`;
+      } else {
+        nextCoordsDiv.innerHTML = `<p>Dette er siste post! Svar på spørsmålene — dere er i mål! 🏁</p>`;
+      }
     }
 
     if (!navigator.geolocation) {
@@ -479,6 +461,8 @@
     const clockHour = Math.round(((bearing + 15) % 360) / 30);
     return clockHour === 0 ? 12 : clockHour;
   }
+
+  window.addEventListener('DOMContentLoaded', loadAllCoordinates);
   </script>
 
 </body>

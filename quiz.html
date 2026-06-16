@@ -219,6 +219,25 @@
       color: #0288D1;
       font-weight: 700;
     }
+
+    .show-next-btn {
+      display: block;
+      width: 100%;
+      padding: 12px;
+      background: transparent;
+      color: #0288D1;
+      border: 2px solid #29B6F6;
+      border-radius: 10px;
+      font-family: 'Nunito', Arial, sans-serif;
+      font-size: 0.95em;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .show-next-btn:hover {
+      background: rgba(41, 182, 246, 0.15);
+    }
   </style>
 </head>
 <body>
@@ -352,6 +371,35 @@
     }
   }
 
+  function buildNextCoordsHTML(team, post) {
+    const postNum = parseInt(post.split(" ")[1]);
+    const nextPostKey = "Post " + (postNum + 1);
+    const nextPost = postCoordinates[team][nextPostKey];
+
+    if (nextPost) {
+      const lat = nextPost.lat.toFixed(5);
+      const lon = nextPost.lon.toFixed(5);
+      const gmapLink = `https://www.google.com/maps?q=${lat},${lon}`;
+      return `<p>Neste post finner dere her:<br>
+        <strong>${nextPostKey}:</strong> Lat ${lat}, Lon ${lon}</p>
+        <p><a href="${gmapLink}" target="_blank">Vis i Google Maps 🗺️</a></p>`;
+    }
+    const after = postCoordinates[team]._afterLast;
+    if (after) {
+      const lat = after.lat.toFixed(5);
+      const lon = after.lon.toFixed(5);
+      const gmapLink = `https://www.google.com/maps?q=${lat},${lon}`;
+      return `<p>Dette er siste post! Svar på spørsmålene, og gå til:<br>
+        <strong>Mål:</strong> Lat ${lat}, Lon ${lon} 🏁</p>
+        <p><a href="${gmapLink}" target="_blank">Vis i Google Maps 🗺️</a></p>`;
+    }
+    return `<p>Dette er siste post! Svar på spørsmålene — dere er i mål! 🏁</p>`;
+  }
+
+  function showNextCoords(team, post) {
+    document.getElementById("nextCoords").innerHTML = buildNextCoordsHTML(team, post);
+  }
+
   function checkPosition() {
     const team = document.getElementById("team").value;
     const post = document.getElementById("post").value;
@@ -378,34 +426,6 @@
       return;
     }
 
-    // Vis neste post / mål
-    const postNum = parseInt(post.split(" ")[1]);
-    const nextPostKey = "Post " + (postNum + 1);
-    const nextPost = postCoordinates[team][nextPostKey];
-
-    if (nextPost) {
-      const lat = nextPost.lat.toFixed(5);
-      const lon = nextPost.lon.toFixed(5);
-      const gmapLink = `https://www.google.com/maps?q=${lat},${lon}`;
-      nextCoordsDiv.innerHTML = `
-        <p>Neste post finner dere her:<br>
-        <strong>${nextPostKey}:</strong> Lat ${lat}, Lon ${lon}</p>
-        <p><a href="${gmapLink}" target="_blank">Vis i Google Maps 🗺️</a></p>`;
-    } else {
-      const after = postCoordinates[team]._afterLast;
-      if (after) {
-        const lat = after.lat.toFixed(5);
-        const lon = after.lon.toFixed(5);
-        const gmapLink = `https://www.google.com/maps?q=${lat},${lon}`;
-        nextCoordsDiv.innerHTML = `
-          <p>Dette er siste post! Svar på spørsmålene, og gå til:<br>
-          <strong>Mål:</strong> Lat ${lat}, Lon ${lon} 🏁</p>
-          <p><a href="${gmapLink}" target="_blank">Vis i Google Maps 🗺️</a></p>`;
-      } else {
-        nextCoordsDiv.innerHTML = `<p>Dette er siste post! Svar på spørsmålene — dere er i mål! 🏁</p>`;
-      }
-    }
-
     if (!navigator.geolocation) {
       msg.innerText = "Geolokasjon støttes ikke av nettleseren.";
       return;
@@ -422,8 +442,10 @@
 
         if (dist <= maxDistanceMeters) {
           questionBox.innerText = quizQuestions[post] || "Ingen spørsmål definert.";
+          nextCoordsDiv.innerHTML = buildNextCoordsHTML(team, post);
         } else {
           msg.innerText = `Du er ${Math.round(dist)} meter unna riktig posisjon. Gå nærmere posten.\nRetning mot posten: kl. ${clockDir}.\n(Klokka 12 er rett mot Nord)`;
+          nextCoordsDiv.innerHTML = `<button class="show-next-btn" onclick="showNextCoords('${team.replace(/'/g, "\\'")}', '${post}')">📍 Vis neste post</button>`;
         }
       },
       function(error) {

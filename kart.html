@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Kartoversikt – Sommerquiz 2026</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #f0f4f8;
+      color: #2d3748;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      background: linear-gradient(135deg, #1a73e8, #0d47a1);
+      color: white;
+      padding: 14px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+
+    header h1 { font-size: 1.2em; font-weight: 700; }
+
+    .badge {
+      font-size: 0.75em;
+      background: rgba(255,255,255,0.2);
+      padding: 4px 10px;
+      border-radius: 20px;
+    }
+
+    .main {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    #map { flex: 1; }
+
+    .sidebar {
+      width: 210px;
+      background: white;
+      padding: 16px;
+      overflow-y: auto;
+      box-shadow: -2px 0 8px rgba(0,0,0,0.08);
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .sidebar-section h2 {
+      font-size: 0.72em;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #718096;
+      margin-bottom: 10px;
+    }
+
+    .lag-item {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 7px 6px;
+      border-radius: 7px;
+      cursor: pointer;
+      transition: background 0.15s;
+      margin-bottom: 2px;
+      user-select: none;
+    }
+
+    .lag-item:hover { background: #f7fafc; }
+
+    .lag-item input[type="checkbox"] {
+      width: 15px;
+      height: 15px;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .lag-dot {
+      width: 13px;
+      height: 13px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .lag-label { font-weight: 600; font-size: 0.88em; }
+
+    .divider {
+      border: none;
+      border-top: 1px solid #e2e8f0;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 3px 6px;
+      font-size: 0.83em;
+      color: #4a5568;
+    }
+
+    .legend-dot {
+      width: 13px;
+      height: 13px;
+      border-radius: 50%;
+      border: 2px solid rgba(0,0,0,0.2);
+      flex-shrink: 0;
+    }
+
+    .legend-line {
+      width: 24px;
+      height: 3px;
+      border-top: 3px dashed #999;
+      flex-shrink: 0;
+    }
+
+    #loadingOverlay {
+      position: absolute;
+      top: 50%;
+      left: calc(50% - 105px);
+      transform: translateY(-50%);
+      background: white;
+      padding: 20px 28px;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+      z-index: 1000;
+      text-align: center;
+      font-size: 0.95em;
+      color: #4a5568;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>🗺️ Kartoversikt – Sommerquiz 2026</h1>
+    <span class="badge">Kun intern bruk</span>
+  </header>
+
+  <div class="main">
+    <div id="map">
+      <div id="loadingOverlay">⏳ Laster koordinater…</div>
+    </div>
+
+    <div class="sidebar">
+      <div class="sidebar-section">
+        <h2>Vis lag</h2>
+        <div id="lagToggles"></div>
+      </div>
+
+      <hr class="divider">
+
+      <div class="sidebar-section">
+        <h2>Tegnforklaring</h2>
+        <div class="legend-item">
+          <div class="legend-dot" style="background:#27ae60;"></div>
+          Start (felles)
+        </div>
+        <div class="legend-item">
+          <div class="legend-dot" style="background:#c0392b;"></div>
+          Mål (felles)
+        </div>
+        <div class="legend-item">
+          <div class="legend-dot" style="background:#555;"></div>
+          Post (lag-spesifikk)
+        </div>
+        <div class="legend-item" style="margin-top:6px;">
+          <div class="legend-line"></div>
+          Rute per lag
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const LAG_COLORS = ['#e74c3c', '#3498db', '#27ae60', '#f39c12', '#9b59b6', '#16a085'];
+    const LAG_NAMES  = ['Lag 1', 'Lag 2', 'Lag 3', 'Lag 4', 'Lag 5', 'Lag 6'];
+
+    const map = L.map('map');
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors',
+      maxZoom: 19
+    }).addTo(map);
+
+    function parseCSVPoints(text) {
+      return text.trim().split('\n').slice(1).map(line => {
+        const coordMatch = line.match(/POINT \(([0-9.]+) ([0-9.]+)\)/);
+        const nameMatch  = line.match(/",[^,]*,(.+)$/);
+        if (!coordMatch) return null;
+        return {
+          lon:  parseFloat(coordMatch[1]),
+          lat:  parseFloat(coordMatch[2]),
+          name: nameMatch ? nameMatch[1].trim() : ''
+        };
+      }).filter(Boolean);
+    }
+
+    function divMarker(lat, lon, color, label, popupHtml) {
+      const icon = L.divIcon({
+        className: '',
+        html: `<div style="
+          background:${color}; color:white;
+          width:28px; height:28px; border-radius:50%;
+          display:flex; align-items:center; justify-content:center;
+          font-size:11px; font-weight:700;
+          border:2px solid white;
+          box-shadow:0 2px 6px rgba(0,0,0,0.35);
+          white-space:nowrap;
+        ">${label}</div>`,
+        iconSize: [28, 28],
+        iconAnchor: [14, 14],
+        popupAnchor: [0, -18],
+      });
+      return L.marker([lat, lon], { icon }).bindPopup(popupHtml);
+    }
+
+    const layerGroups = {};
+    const allBounds   = [];
+
+    async function loadMap() {
+      const base = './Maps/';
+      try {
+        // Start / Mål
+        const startRes    = await fetch(base + encodeURIComponent('Quiz- 06 Start_mål.csv'));
+        if (!startRes.ok) throw new Error('Fant ikke Start_mål.csv');
+        const startPoints = parseCSVPoints(await startRes.text());
+        const startPt     = startPoints[0];
+        const maalPt      = startPoints[1];
+
+        allBounds.push([startPt.lat, startPt.lon]);
+        allBounds.push([maalPt.lat,  maalPt.lon]);
+
+        const commonLayer = L.layerGroup().addTo(map);
+        divMarker(startPt.lat, startPt.lon, '#27ae60', 'S',
+          `<b>Start</b><br>Felles for alle lag<br><small>Lat ${startPt.lat.toFixed(5)}, Lon ${startPt.lon.toFixed(5)}</small>`)
+          .addTo(commonLayer);
+        divMarker(maalPt.lat, maalPt.lon, '#c0392b', 'M',
+          `<b>Mål</b><br>Felles for alle lag<br><small>Lat ${maalPt.lat.toFixed(5)}, Lon ${maalPt.lon.toFixed(5)}</small>`)
+          .addTo(commonLayer);
+
+        // Each lag — fetch parallelt, men legg til sidebar i fast rekkefølge
+        const toggleContainer = document.getElementById('lagToggles');
+
+        const lagData = await Promise.all(LAG_NAMES.map(async (lag, idx) => {
+          const res = await fetch(base + encodeURIComponent(`Quiz- 06_${lag}.csv`));
+          if (!res.ok) throw new Error(`Fant ikke ${lag}.csv`);
+          return { lag, idx, pts: parseCSVPoints(await res.text()) };
+        }));
+
+        lagData.forEach(({ lag, idx, pts }) => {
+          const color = LAG_COLORS[idx];
+          const group = L.layerGroup().addTo(map);
+          layerGroups[lag] = group;
+
+          const routeLine = [[startPt.lat, startPt.lon]];
+
+          // Post 1–5 = Punkt 1–5
+          pts.slice(0, 5).forEach((pt, i) => {
+            allBounds.push([pt.lat, pt.lon]);
+            routeLine.push([pt.lat, pt.lon]);
+            divMarker(pt.lat, pt.lon, color, `P${i + 1}`,
+              `<b>${lag} – Post ${i + 1}</b><br>${pt.name}<br>
+               <small>Lat ${pt.lat.toFixed(5)}, Lon ${pt.lon.toFixed(5)}</small>`)
+              .addTo(group);
+          });
+
+          routeLine.push([maalPt.lat, maalPt.lon]);
+          L.polyline(routeLine, { color, weight: 2.5, opacity: 0.65, dashArray: '7 5' }).addTo(group);
+
+          const wrap = document.createElement('label');
+          wrap.className = 'lag-item';
+          wrap.innerHTML = `
+            <input type="checkbox" checked onchange="toggleLag('${lag}', this.checked)">
+            <div class="lag-dot" style="background:${color}"></div>
+            <span class="lag-label">${lag}</span>`;
+          toggleContainer.appendChild(wrap);
+        });
+
+        if (allBounds.length) map.fitBounds(allBounds, { padding: [40, 40] });
+        document.getElementById('loadingOverlay').style.display = 'none';
+
+      } catch (e) {
+        document.getElementById('loadingOverlay').innerHTML =
+          `⚠️ Kunne ikke laste koordinater.<br>
+           <small style="color:#888">${e.message}</small><br><br>
+           <small>Krever webserver – bruk VS Code Live Server eller GitHub Pages.</small>`;
+      }
+    }
+
+    function toggleLag(lag, visible) {
+      visible ? map.addLayer(layerGroups[lag]) : map.removeLayer(layerGroups[lag]);
+    }
+
+    loadMap();
+  </script>
+</body>
+</html>

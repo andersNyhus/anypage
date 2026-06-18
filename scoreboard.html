@@ -320,14 +320,15 @@
       const rows = json.table.rows.map(r => r.c.map(c => c?.v ?? ""));
 
       const data = rows.map(row => ({
-        Lag:    row[0],
-        Post_2: parseFloat(row[1]),
-        Post_3: parseFloat(row[2]),
-        Post_4: parseFloat(row[3]),
-        Post_5: parseFloat(row[4]),
-        poeng:  parseFloat(row[5]),
-        Navn:   row[6],
-        Juks:   row[7]
+        Lag:      row[0],
+        Quiz_A:   parseFloat(row[1]),
+        Quiz_B:   parseFloat(row[2]),
+        Quiz_C:   parseFloat(row[3]),
+        Ane_Rol:  parseFloat(row[4]),
+        Helpdesk: parseFloat(row[5]),
+        poeng:    parseFloat(row[6]),
+        Navn:     row[7],
+        Juks:     row[8]
       }));
 
       const sorted = [...data].sort((a, b) => b.poeng - a.poeng);
@@ -383,7 +384,7 @@
     }
 
     function drawTable(data) {
-      const columns = ["Lag", "Post_2", "Post_3", "Post_4", "Post_5", "poeng"];
+      const columns = ["Lag", "Quiz_A", "Quiz_B", "Quiz_C", "Ane_Rol", "Helpdesk", "poeng"];
       const modifiedData = data.map(row => ({
         ...row,
         Lag: row.Lag.replace(/^Lag\s*/i, "")
@@ -392,14 +393,15 @@
     }
 
     function drawDetailedTable(data) {
-      const columns = ["Lag", "Navn", "Post_2", "Post_3", "Post_4", "Post_5", "poeng", "Juks"];
+      const columns = ["Lag", "Navn", "Quiz_A", "Quiz_B", "Quiz_C", "Ane_Rol", "Helpdesk", "poeng", "Juks"];
       renderTable("detailedTable", "detailedHeader", data, columns);
     }
 
     function renderTable(tableId, headerId, data, columns) {
       const headerMap = {
         Lag: "Lag", Navn: "Navn",
-        Post_2: "Post 2", Post_3: "Post 3", Post_4: "Post 4", Post_5: "Post 5",
+        Quiz_A: "Quiz A", Quiz_B: "Quiz B", Quiz_C: "Quiz C",
+        Ane_Rol: "A&E", Helpdesk: "Helpdesk",
         poeng: "Sum", Juks: "QC"
       };
       const medals = ['🥇', '🥈', '🥉'];

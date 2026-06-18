@@ -142,11 +142,32 @@
       font-weight: 700;
     }
 
-    .post-divider {
+    .tabs {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      margin-bottom: 24px;
+    }
+
+    .tab-btn {
+      padding: 10px 22px;
       border: none;
-      height: 2px;
-      background: linear-gradient(to right, transparent, #FFB300, transparent);
-      margin: 24px 0;
+      border-radius: 20px;
+      font-family: 'Nunito', Arial, sans-serif;
+      font-size: 0.95em;
+      font-weight: 700;
+      cursor: pointer;
+      background: rgba(255,255,255,0.5);
+      color: #5d4037;
+      transition: all 0.2s;
+    }
+
+    .tab-btn:hover { background: rgba(255,255,255,0.8); }
+
+    .tab-btn.active {
+      background: linear-gradient(135deg, #FF7043, #FF5722);
+      color: white;
+      box-shadow: 0 4px 12px rgba(255,87,34,0.35);
     }
 
     .pending-message {
@@ -168,6 +189,12 @@
       <h1>Fasit ✅</h1>
       <hr class="divider">
 
+      <div class="tabs" id="fasit-tabs" style="display:none;">
+        <button class="tab-btn active" onclick="showQuiz(0)">Quiz A</button>
+        <button class="tab-btn"        onclick="showQuiz(1)">Quiz B</button>
+        <button class="tab-btn"        onclick="showQuiz(2)">Quiz C</button>
+      </div>
+
       <div class="content" id="fasit-content">
         <!-- Filled by script below -->
       </div>
@@ -186,86 +213,67 @@
     const VIS_FASIT = false;
     //const VIS_FASIT = true;
 
-    const fasitData = [
-      {
-        post: "Post 1",
-        spørsmål: [
-          { q: "Spørsmål 1", a: "Svar 1" },
-          { q: "Spørsmål 2", a: "Svar 2" },
-          { q: "Spørsmål 3", a: "Svar 3" },
-          { q: "Spørsmål 4", a: "Svar 4" },
-          { q: "Spørsmål 5", a: "Svar 5" },
-        ]
-      },
-      {
-        post: "Post 2",
-        spørsmål: [
-          { q: "Spørsmål 1", a: "Svar 1" },
-          { q: "Spørsmål 2", a: "Svar 2" },
-          { q: "Spørsmål 3", a: "Svar 3" },
-          { q: "Spørsmål 4", a: "Svar 4" },
-          { q: "Spørsmål 5", a: "Svar 5" },
-        ]
-      },
-      {
-        post: "Post 3",
-        spørsmål: [
-          { q: "Spørsmål 1", a: "Svar 1" },
-          { q: "Spørsmål 2", a: "Svar 2" },
-          { q: "Spørsmål 3", a: "Svar 3" },
-          { q: "Spørsmål 4", a: "Svar 4" },
-          { q: "Spørsmål 5", a: "Svar 5" },
-        ]
-      },
-      {
-        post: "Post 4",
-        spørsmål: [
-          { q: "Spørsmål 1", a: "Svar 1" },
-          { q: "Spørsmål 2", a: "Svar 2" },
-          { q: "Spørsmål 3", a: "Svar 3" },
-          { q: "Spørsmål 4", a: "Svar 4" },
-          { q: "Spørsmål 5", a: "Svar 5" },
-        ]
-      },
-      {
-        post: "Post 5",
-        spørsmål: [
-          { q: "Spørsmål 1", a: "Svar 1" },
-          { q: "Spørsmål 2", a: "Svar 2" },
-          { q: "Spørsmål 3", a: "Svar 3" },
-          { q: "Spørsmål 4", a: "Svar 4" },
-          { q: "Spørsmål 5", a: "Svar 5" },
-        ]
-      }
-    ];
+    const SHEET_ID  = '1Y1IlCc7Rdr4eP29OtzfeuFMzyw2j9JBRjLM5hUA3wzQ';
+    const QUIZ_NAVN = ['Quiz A', 'Quiz B', 'Quiz C'];
 
     const container = document.getElementById('fasit-content');
+
+    async function loadFasit() {
+      const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=Fasit&range=A14:K20&headers=0`;
+      try {
+        const res  = await fetch(url);
+        const text = await res.text();
+        const json = JSON.parse(text.substr(47).slice(0, -2));
+        const rows = json.table.rows.map(r => r.c.map(c => c?.v ?? ""));
+
+        // Kolonne A = label, B–K = spørsmål/svar 1–10
+        // Rad 0 = overskrift i arket, rad 1+2 = Quiz A, 3+4 = Quiz B, 5+6 = Quiz C
+        QUIZ_NAVN.forEach((navn, i) => {
+          const spørsmålRad = rows[i * 2 + 1];
+          const svarRad     = rows[i * 2 + 2];
+          if (!spørsmålRad || !svarRad) return;
+
+          const spørsmål = spørsmålRad.slice(1);
+          const svar     = svarRad.slice(1);
+
+          const items = spørsmål.map((q, qi) => {
+            if (!q && !svar[qi]) return '';
+            return `
+              <div class="qa-item">
+                <div class="question">${q}</div>
+                <div class="answer">→ ${svar[qi] ?? ''}</div>
+              </div>`;
+          }).filter(Boolean).join('');
+
+          const section = document.createElement('div');
+          section.className = 'post-section';
+          section.id = `quiz-section-${i}`;
+          section.style.display = i === 0 ? 'block' : 'none';
+          section.innerHTML = `<div class="post-title">${navn}</div>${items}`;
+          container.appendChild(section);
+        });
+
+        document.getElementById('fasit-tabs').style.display = 'flex';
+      } catch (e) {
+        container.innerHTML = `<p class="pending-message" style="color:#c62828;">Kunne ikke laste fasit: ${e.message}</p>`;
+      }
+    }
+
+    function showQuiz(idx) {
+      QUIZ_NAVN.forEach((_, i) => {
+        const section = document.getElementById(`quiz-section-${i}`);
+        if (section) section.style.display = i === idx ? 'block' : 'none';
+      });
+      document.querySelectorAll('.tab-btn').forEach((btn, i) => {
+        btn.classList.toggle('active', i === idx);
+      });
+    }
 
     if (!VIS_FASIT) {
       container.innerHTML = `<p class="pending-message">Her kommer fasiten når alle er i mål! 🏁</p>`;
     } else {
-      fasitData.forEach((post, idx) => {
-        const section = document.createElement('div');
-        section.className = 'post-section';
-
-        const items = post.spørsmål.map(s => `
-          <div class="qa-item">
-            <div class="question">${s.q}</div>
-            <div class="answer">→ ${s.a}</div>
-          </div>`).join('');
-
-        section.innerHTML = `
-          <div class="post-title">${post.post}</div>
-          ${items}`;
-
-        container.appendChild(section);
-
-        if (idx < fasitData.length - 1) {
-          const divider = document.createElement('hr');
-          divider.className = 'post-divider';
-          container.appendChild(divider);
-        }
-      });
+      container.innerHTML = `<p class="pending-message">Laster fasit…</p>`;
+      loadFasit();
     }
   </script>
 
